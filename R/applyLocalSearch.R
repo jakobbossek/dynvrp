@@ -1,14 +1,6 @@
 applyLocalSearch = function(ind, instance, more.args, ...) {
   active.nodes = which(ind$b == 1L & ind$it != 1)
   idx.tour = sort(which(ind$t %in% active.nodes))
-#  print(idx.tour)
-
-  print("------------------------")
-  before = sort(ind$t)
-
-  # if (length(ind$init.tour) > 0L) {
-  #   active.nodes = active.nodes[!(active.nodes %in% ind$init.tour)]
-  # }
 
   # we need to consider the initially driven tour,
   # i.e., search for Hamiltionian path from last customer of
@@ -35,29 +27,9 @@ applyLocalSearch = function(ind, instance, more.args, ...) {
     print(pl1)
   }
   # BBmisc::pause()
-  BBmisc::catf("#active: %i", sum(ind$b))
-  BBmisc::catf("#init: %i", n.init)
 
-  # if (n.init > 0) {
-  #   print(str(ind))
-  #   print(sum(ind$b))
-  #   print(ind$n.mandatory)
-  #   stop("LS finished")
-  # }
+  # nodes 1 and 2 are depots above. Hence, we need to recode to 1-based representation.
   ind$t[idx.tour] = ls.res - 2L
-  after = sort(ind$t)
 
-  print(sort(ls.res))
-  print(sort(active.nodes))
-  #stop("djsadh")
-
-  BBmisc::catf("Check: %i", all(before == after))
-  BBmisc::catf("Before distinct: %i", length(unique(before)))
-  BBmisc::catf("After distinct: %i", length(unique(after)))
-
-  #print(ind$t)
-  print("------------------------")
-
-  #stop("DEBUG")
   return(ind)
 }

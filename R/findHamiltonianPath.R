@@ -1,7 +1,25 @@
+#' @title Find Hamiltonian path in network
+#'
+#' @description Given a network instance, a set of nodes to consider
+#' and designated start and end nodes the function heuristically determines
+#' a shortest Hamiltonian path from start node to end node considering
+#' all active nodes.
+#'
+#' @param instance [Network]\cr
+#'   A netgen network.
+#' @param active.nodes [\code{integer}]\cr
+#'   Node numbers of nodes to be considered.
+#' @param start.id [\code{integer(1)}]\cr
+#'   Node number of start node.
+#' @param dest.id [\code{integer(1)}]\cr
+#'   Node number of destination node.
+#' @return [\code{integer}]
 #' @export
-findHamiltonianPath = function(instance,
+findHamiltonianPath = function(
+  instance,
   active.nodes = seq_len(salesperson::getNumberOfNodes(instance) + 2L),
-  start.id = 80L, dest.id = 2L) {
+  start.id = 1L,
+  dest.id = 2L) {
 
   # get information from source instance
   dist.mat = instance$dmat

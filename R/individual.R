@@ -13,8 +13,11 @@
 #'   \item[\code{b}]{Binary vector of length |V| - 2. b[i] is 1, if customer i is active, i.e., in tour.}
 #'   \item[\code{t}]{Permutation vector.}
 #'   \item[\code{p}]{Vector of mutation probablities. I.e., p[i] is the probability to flip b[i]. p[i] is zero if customer i is already fixed or not yet released.}
+#'   \item[\code{it}]{Binary vector of length |V| - 2. it[i] is 1 if and only if customer i is in initial tour.}
 #'   \item[n.mandatory \code{integer(1)}]{Number of mandatory customers.}
 #'   \item[idx.dynamic.available \code{integer}]{IDs/positions of dynamic customers which already requested serving.}
+#'   \item[n.dynamic.active \code{integer(1)}]{Number of active dynamic customers i (i.e., b[i] = 1)}
+#'   \item[n.dynamic.inactive \code{integer(1)}]{Number of available, but not active dynamic customers i (i.e., b[i] = 0)}
 #'   \item[init.tour \code{integer}]{Fixed tour part, i.e., sequence of nodes already visited.}
 #' }
 initIndividual = function(instance, current.time = 0, init.tour = integer()) {
@@ -89,17 +92,20 @@ initIndividual = function(instance, current.time = 0, init.tour = integer()) {
 }
 
 #' Simple printer for individuals.
+#' @export
 print.VRPIndividual = function(x, ...) {
   catf("#Active customers:         %i", sum(x$b))
   catf("#Active dynamic customers: %i", sum(x$b) - x$n.mandatory)
 }
 
+#' Construct tour from individual.
+#' @export
 getTourFromIndividual = function(ind, ...) {
   # get active customers
   idx.active = which(ind$b == 1L)
   idx.tour = sort(which(ind$t %in% idx.active))
 
-  # +2 since we are 1-based in encoding
+  # +2 since we are 1-based in encoding and 1 and 2 are the depots
   tour = ind$t[idx.tour] + 2L
   return(tour)
 }
