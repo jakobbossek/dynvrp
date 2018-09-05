@@ -30,8 +30,8 @@ instance$dmat   = as.matrix(dist(instance$coords), method = "euclidean")
 emoa.res = dynamicVRPEMOA(
   fitness.fun, decision.fun = decideRank(2L, 1), instance = instance,
   mu = 10L, lambda = 5L,
-  local.search.method = NULL,#"eax",
-  stop.conds = list(ecr::stopOnIters(20000)),
+  local.search.method = "eax",
+  stop.conds = list(ecr::stopOnIters(26)),
   n.timeslots = 2L)
 
 fronts = lapply(emoa.res$era.results, function(x) x$front)
@@ -42,12 +42,12 @@ pl.fronts = plotEras(fronts, current.era, length(fronts) * 100L)
 
 max.era = length(fronts)
 
-ind = emoa.res$era.results[[1]]$result$pareto.set[[1]]
+ind = emoa.res$era.results[[2]]$result$pareto.set[[1]]
 ind.tour = getTourFromIndividual(ind)
 
 pl.instance = autoplot(instance, path = c(1L, ind.tour, 2L))
-idx.man = which(instance$arrival.times == 0) + 2L
-pl.instance = pl.instance + geom_point(data = as.data.frame(instance$coords[idx.man, ]), colour = "red")
+idx.man = which(instance$arrival.times == 0)
+pl.instance = pl.instance + geom_point(data = as.data.frame(instance$coordinates[idx.man, ]), colour = "red")
 
 pl.instance
 gridExtra::grid.arrange(pl.instance, pl.fronts, nrow = 1L)

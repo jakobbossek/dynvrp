@@ -123,6 +123,13 @@ dynamicVRPEMOA = function(fitness.fun,
     stats$era = era
     era.logs[[era]] = stats
 
+    # final LS polishing
+    if (!is.null(local.search.method)) {
+      BBmisc::catf("Polishing solutions.")
+      population = lapply(population, applyLocalSearch, instance = instance, more.args = local.search.args)
+      fitness = ecr::evaluateFitness(control, population, instance = instance)
+    }
+
     front.approx = as.data.frame(t(fitness))
     colnames(front.approx) = c("f1", "f2")
     front.approx$era = era
