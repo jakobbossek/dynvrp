@@ -30,10 +30,11 @@ instance$dmat   = as.matrix(dist(instance$coords), method = "euclidean")
 
 st = proc.time()
 emoa.res = dynamicVRPEMOA(
-  fitness.fun, decision.fun = decideRank(2L, 0), instance = instance,
-  mu = 50L, lambda = 5L,
+  fitness.fun, decision.fun = decideRank(1L, 0), instance = instance,
+  mu = 10L, lambda = 5L,
   local.search.method = "eax",
-  stop.conds = list(ecr::stopOnIters(10000)),
+  init.keep = TRUE,
+  stop.conds = list(ecr::stopOnIters(100)),
   n.timeslots = 7L)
 time.passed = proc.time() - st
 

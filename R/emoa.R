@@ -20,9 +20,14 @@
 #' @param do.pause [\code{logical(1)}]\cr
 #'   Pause execution after each time slot?
 #'   Default is \code{FALSE}.
+#' @param init.keep [\code{logical(1)}]\cr
+#'   Should individuals in eras \eqn{> 1} carry over information from last population?
+#'   Default is \code{TRUE}.
 #' @param local.search.method [\code{character(1)}]\cr
 #'   Local search algorithm. Default is \code{NULL}, i.e., no
 #'   local search at all.
+#' @param local.search.steps [\code{numeric}]\cr
+#'   Generations where local search should be applied.
 #' @param stop.conds [\code{list[ecr_terminator]}]\cr
 #'   List of stopping conditions for each internal EMOA run.
 #'   Default is to stop after 100 generations.
@@ -40,9 +45,11 @@ dynamicVRPEMOA = function(fitness.fun,
   instance,
   time.resolution = 100L,
   n.timeslots = NULL,
-  decision.fun = decideRandom,
+  decision.fun = dynvrp::decideRandom,
   do.pause = FALSE,
+  init.keep = TRUE,
   local.search.method = NULL,
+  local.search.gens = 100L,
   stop.conds = list(ecr::stopOnIters(100L)),
   mu = 50L,
   local.search.args = list(),
@@ -82,7 +89,13 @@ dynamicVRPEMOA = function(fitness.fun,
     catf("Starting era %i. Current time: %.2f", era, current.time)
 
     # init EMOA
-    population = ecr::gen(initIndividual(instance, init.tour = init.tour, current.time = current.time), mu)
+    population = if (!init.keep | current.time == 0) {
+      ecr::gen(initIndividual(instance, init.tour = init.tour, current.time = current.time), mu)
+    } else {
+      lapply(population, function(template.ind) {
+        initIndividual(instance, init.tour = init.tour, current.time = current.time, template.ind = template.ind)
+      })
+    }
     fitness = ecr::evaluateFitness(control, population, instance = instance)
 
     log = ecr::initLogger(control,
@@ -98,8 +111,8 @@ dynamicVRPEMOA = function(fitness.fun,
       # no recombination at the moment -> mutate with probability 1
       offspring = ecr::generateOffspring(control, population, fitness, lambda = lambda, p.mut = 1L)
 
-      if (!is.null(local.search.method) & (gen %% 2500 == 0)) {
-        BBmisc::catf("Applying local search")
+      if (!is.null(local.search.method) & (gen %in% local.search.gens)) {
+        BBmisc::catf("Applying local search ...")
         offspring = lapply(offspring, applyLocalSearch, instance = instance, more.args = local.search.args)
       }
 
@@ -134,6 +147,7 @@ dynamicVRPEMOA = function(fitness.fun,
     front.approx = as.data.frame(t(fitness))
     colnames(front.approx) = c("f1", "f2")
     front.approx$era = era
+    front.approx$t   = current.time
 
     era.fronts[[era]] = front.approx
 

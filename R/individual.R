@@ -8,6 +8,9 @@
 #' @param init.tour [\code{integer}]\cr
 #'   Fixed prefix tour, i.e., part of tour which is already fixed,
 #'   because time passed and vehicle already visited some customers.
+#' @param template.tour [\code{integer}]\cr
+#'   Tour used as a \dQuote{template} for a newly generated individual. Here,
+#'   we aim to pass as much information from \code{template.tour} as possible.
 #' @return [\code{VRPIndividual}] List with following components:
 #' \describe{
 #'   \item[\code{b}]{Binary vector of length |V| - 2. b[i] is 1, if customer i is active, i.e., in tour.}
@@ -20,7 +23,7 @@
 #'   \item[n.dynamic.inactive \code{integer(1)}]{Number of available, but not active dynamic customers i (i.e., b[i] = 0)}
 #'   \item[init.tour \code{integer}]{Fixed tour part, i.e., sequence of nodes already visited.}
 #' }
-initIndividual = function(instance, current.time = 0, init.tour = integer()) {
+initIndividual = function(instance, current.time = 0, init.tour = integer(), template.ind = NULL) {
   n = salesperson::getNumberOfNodes(instance)
 
   # mandatory customers: always b = 1 and p = 0, i.e., they are
@@ -60,14 +63,9 @@ initIndividual = function(instance, current.time = 0, init.tour = integer()) {
 
   #FIXME: maybe set p = 1 / n.dynamic.available?
   if (n.dynamic.available > 0L) {
-    #ind$b[idx.dynamic.available] = sample(c(0, 1), size = n.dynamic.available, replace = TRUE, prob = c(0.02, 0.98))
-
     #FIXME: probs need to be 0.5
     ind$b[idx.dynamic.available] = sample(c(0, 1), size = n.dynamic.available, replace = TRUE, prob = c(0.5, 0.5))
     ind$p[idx.dynamic.available] = 1/n.dynamic.available
-    #FIXME: here we assign 1.0 / 0 = Inf in some cases
-    # ind$b[idx.dynamic.available] = sample(c(0, 1), size = n.dynamic.available, replace = TRUE, prob = c(0.5, 0.5))
-    # ind$p[idx.dynamic.available] = 1.0 / (n - n.mandatory - n.dynamic.available)
   }
 
   # adapt individual if some customers are already visited
@@ -77,6 +75,19 @@ initIndividual = function(instance, current.time = 0, init.tour = integer()) {
     ind$b[init.tour] = 1L
     ind$p[init.tour] = 0L
     ind$it[init.tour] = 1L
+  }
+
+  #FIXME: use only nondominated solutions?
+  # now adapt tour if template is passed
+  if (!is.null(template.ind)) {
+    # carry over all active nodes of template
+    idx.template.active = which(template.ind$b == 1L)
+    ind$b[idx.template.active] = 1L
+
+    # assure that active nodes are in the order they occured in template
+    active.nodes = which(template.ind$b == 1 & ind$it != 1)
+    idx.tour = which(ind$t %in% active.nodes)
+    ind$t[idx.tour] = active.nodes
   }
 
   ind$n.dynamic.active = sum(ind$b[idx.dynamic.available])
