@@ -6,6 +6,17 @@
 \usage{
 computeTourLength(ind, instance)
 }
+\arguments{
+\item{ind}{[\code{VRPIndividual}]\cr
+Instance of type \code{VRPIndividual}.}
+
+\item{instance}{[\code{Network}\cr
+Netgen network with slots \dQuote{coords} and \dQuote{dmat}, i.e., coordinates
+and distance matrix with start and end depot!}
+}
+\value{
+[\code{numeric(1)}]
+}
 \seealso{
 fitness.fun
 }

@@ -23,7 +23,8 @@ Imports:
     salesperson
 Suggests:
     testthat (>= 0.9.1),
-    rmarkdown
+    rmarkdown,
+    knitr
 ByteCompile: yes
 LazyData: yes
 RoxygenNote: 6.0.1

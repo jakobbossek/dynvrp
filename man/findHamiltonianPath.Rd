@@ -2,12 +2,32 @@
 % Please edit documentation in R/findHamiltonianPath.R
 \name{findHamiltonianPath}
 \alias{findHamiltonianPath}
-\title{@export}
+\title{Find Hamiltonian path in network}
 \usage{
 findHamiltonianPath(instance,
-  active.nodes = seq_len(getNumberOfNodes(instance) + 2L), start.id = 80L,
-  dest.id = 2L)
+  active.nodes = seq_len(salesperson::getNumberOfNodes(instance) + 2L),
+  start.id = 1L, dest.id = 2L)
+}
+\arguments{
+\item{instance}{[Network]\cr
+A netgen network.}
+
+\item{active.nodes}{[\code{integer}]\cr
+Node numbers of nodes to be considered.}
+
+\item{start.id}{[\code{integer(1)}]\cr
+Node number of start node.}
+
+\item{dest.id}{[\code{integer(1)}]\cr
+Node number of destination node.}
+}
+\value{
+[\code{integer}]
+ @export
 }
 \description{
-@export
+Given a network instance, a set of nodes to consider
+and designated start and end nodes the function heuristically determines
+a shortest Hamiltonian path from start node to end node considering
+all active nodes.
 }

@@ -8,9 +8,10 @@ PATH.TO.INSTANCES = normalizePath("/Users/jboss/repositories/paper/orienteering_
 SOLVER.PATH = c("eax" = file.path("/Users/jboss/repositories/paper/tsp_publications/TSPAS/solvers/EAX/main"))
 salesperson::solverPaths(as.list(SOLVER.PATH))
 
-#aposteriori = read.table("results/aposteriori.csv", header = TRUE)
+aposteriori = read.table("inst/results/aposteriori.csv", header = TRUE)
 
 instance.path = file.path(PATH.TO.INSTANCES, " vrp_morphed_n100_mo25_dyn75_r1.csv")
+inst = " vrp_morphed_n100_mo25_dyn75_r1.csv"
 
 catf("Importing instance %s", instance.path)
 instance = salesperson::importFromFile(instance.path)
@@ -27,22 +28,24 @@ instance = salesperson::importFromFile(instance.path)
 instance$coords = rbind(instance$depot.coordinates, instance$coordinates)
 instance$dmat   = as.matrix(dist(instance$coords), method = "euclidean")
 
+st = proc.time()
 emoa.res = dynamicVRPEMOA(
-  fitness.fun, decision.fun = decideRank(2L, 1), instance = instance,
-  mu = 10L, lambda = 5L,
+  fitness.fun, decision.fun = decideRank(2L, 0), instance = instance,
+  mu = 50L, lambda = 5L,
   local.search.method = "eax",
-  stop.conds = list(ecr::stopOnIters(26)),
-  n.timeslots = 2L)
+  stop.conds = list(ecr::stopOnIters(10000)),
+  n.timeslots = 7L)
+time.passed = proc.time() - st
 
 fronts = lapply(emoa.res$era.results, function(x) x$front)
 current.era = length(fronts)
 
-#the.aposteriori = aposteriori[aposteriori$prob == gsub(" ", "", basename(inst)), , drop = FALSE]
-pl.fronts = plotEras(fronts, current.era, length(fronts) * 100L)
+the.aposteriori = aposteriori[aposteriori$prob == gsub(" ", "", basename(inst)), , drop = FALSE]
+pl.fronts = plotEras(fronts, current.era, length(fronts) * 100L, a.posteriori.approx = the.aposteriori)
 
 max.era = length(fronts)
 
-ind = emoa.res$era.results[[2]]$result$pareto.set[[1]]
+ind = emoa.res$era.results[[max.era]]$result$pareto.set[[1]]
 ind.tour = getTourFromIndividual(ind)
 
 pl.instance = autoplot(instance, path = c(1L, ind.tour, 2L))

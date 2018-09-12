@@ -108,10 +108,10 @@ findHamiltonianPath = function(
   #   active.nodes[cut.tour]
   # }
 
-  print(start.id)
-  p1 = autoplot(instance, path = c(start.id, active.nodes[rev(cut.tour)], dest.id), close.path = FALSE)
-  p2 = autoplot(instance, path = c(start.id, active.nodes[cut.tour], dest.id), close.path = FALSE)
-  gridExtra::grid.arrange(p1, p2, nrow = 1L)
+  # print(start.id)
+  # p1 = autoplot(instance, path = c(start.id, active.nodes[rev(cut.tour)], dest.id), close.path = FALSE)
+  # p2 = autoplot(instance, path = c(start.id, active.nodes[cut.tour], dest.id), close.path = FALSE)
+  # gridExtra::grid.arrange(p1, p2, nrow = 1L)
 
   # stop("WORKS!")
 

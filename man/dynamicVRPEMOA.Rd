@@ -6,8 +6,8 @@
 \usage{
 dynamicVRPEMOA(fitness.fun, instance, time.resolution = 100L,
   n.timeslots = NULL, decision.fun = decideRandom, do.pause = FALSE,
-  stop.conds = list(ecr::stopOnIters(100L)), mu = 50L,
-  local.search.args = list(), lambda = mu, ...)
+  local.search.method = NULL, stop.conds = list(ecr::stopOnIters(100L)),
+  mu = 50L, local.search.args = list(), lambda = mu, ...)
 }
 \arguments{
 \item{fitness.fun}{[\code{function(ind, instance, ...)}]\cr
@@ -35,6 +35,10 @@ Default is \code{decideRandom}, i.e., random choice of solution.}
 \item{do.pause}{[\code{logical(1)}]\cr
 Pause execution after each time slot?
 Default is \code{FALSE}.}
+
+\item{local.search.method}{[\code{character(1)}]\cr
+Local search algorithm. Default is \code{NULL}, i.e., no
+local search at all.}
 
 \item{stop.conds}{[\code{list[ecr_terminator]}]\cr
 List of stopping conditions for each internal EMOA run.

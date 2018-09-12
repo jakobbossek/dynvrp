@@ -35,6 +35,7 @@
 #' @param ... [any]\cr
 #'   Not used at the moment.
 #' @return [list] List of \code{ecr_result} objects.
+#' @export
 dynamicVRPEMOA = function(fitness.fun,
   instance,
   time.resolution = 100L,
@@ -90,14 +91,14 @@ dynamicVRPEMOA = function(fitness.fun,
         pars = list(ref.point = c(10000, 10000))))))
     ecr::updateLogger(log, population, fitness = fitness, n.evals = mu)
 
-    gen = 1L
+    gen = 0L
     # EMOA loop
     while (TRUE) {
 
       # no recombination at the moment -> mutate with probability 1
       offspring = ecr::generateOffspring(control, population, fitness, lambda = lambda, p.mut = 1L)
 
-      if (!is.null(local.search.method) & (gen %% 25 == 0)) {
+      if (!is.null(local.search.method) & (gen %% 2500 == 0)) {
         BBmisc::catf("Applying local search")
         offspring = lapply(offspring, applyLocalSearch, instance = instance, more.args = local.search.args)
       }

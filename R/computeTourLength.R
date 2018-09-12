@@ -1,5 +1,11 @@
 #' @title Helper for tour length computation.
 #'
+#' @param ind [\code{VRPIndividual}]\cr
+#'   Instance of type \code{VRPIndividual}.
+#' @param instance [\code{Network}\cr
+#'   Netgen network with slots \dQuote{coords} and \dQuote{dmat}, i.e., coordinates
+#'   and distance matrix with start and end depot!
+#' @return [\code{numeric(1)}]
 #' @seealso fitness.fun
 computeTourLength = function(ind, instance) {
   assertClass(ind, "VRPIndividual")
