@@ -26,7 +26,7 @@
 #' @param local.search.method [\code{character(1)}]\cr
 #'   Local search algorithm. Default is \code{NULL}, i.e., no
 #'   local search at all.
-#' @param local.search.steps [\code{numeric}]\cr
+#' @param local.search.gens [\code{numeric}]\cr
 #'   Generations where local search should be applied.
 #' @param stop.conds [\code{list[ecr_terminator]}]\cr
 #'   List of stopping conditions for each internal EMOA run.
@@ -65,10 +65,14 @@ dynamicVRPEMOA = function(fitness.fun,
   mu = asInt(mu, lower = 5L)
   lambda = asInt(lambda, lower = 5L)
 
+
   # preprocessing
   max.time = max(instance$arrival.times)
+  n.dynamic = sum(instance$arrival.times > 0)
+  n.mandatory = sum(instance$arrival.times == 0)
+
   if (is.null(n.timeslots))
-    n.timeslots = ceiling(max.time / time.resolution)
+    n.timeslots = ceiling(max.time / time.resolution) + 1L
   n.timeslots = asInt(n.timeslots, lower = 1L)
   current.time = 0
 
@@ -80,9 +84,6 @@ dynamicVRPEMOA = function(fitness.fun,
 
   init.tour = integer()
   era.results = vector(mode = "list", length = n.timeslots)
-  era.fronts  = vector(mode = "list", length = n.timeslots)
-  era.decisions = integer(n.timeslots)
-  era.logs = vector(mode = "list", length = n.timeslots)
   stop.object = NA
 
   for (era in seq_len(n.timeslots)) {
@@ -99,9 +100,7 @@ dynamicVRPEMOA = function(fitness.fun,
     fitness = ecr::evaluateFitness(control, population, instance = instance)
 
     log = ecr::initLogger(control,
-      log.stats = list(fitness = list("HV" = list(
-        fun = ecr::computeHV,
-        pars = list(ref.point = c(10000, 10000))))))
+      log.pop = TRUE)
     ecr::updateLogger(log, population, fitness = fitness, n.evals = mu)
 
     gen = 0L
@@ -133,9 +132,12 @@ dynamicVRPEMOA = function(fitness.fun,
         break
       }
     }
-    stats = ecr::getStatistics(log)
-    stats$era = era
-    era.logs[[era]] = stats
+
+    # log statistics
+    era.stats = ecr::getStatistics(log)
+    era.stats$era = era
+
+    era.results[[era]]$stats = era.stats
 
     # final LS polishing
     if (!is.null(local.search.method)) {
@@ -146,32 +148,51 @@ dynamicVRPEMOA = function(fitness.fun,
 
     front.approx = as.data.frame(t(fitness))
     colnames(front.approx) = c("f1", "f2")
+
+    # here we "shift" the second objective considering ALL dynamic customers
+    # This is needed for visualization within scatterplots with the ILP and a posteriori stuff.
+    n.dynamic.available = sum(instance$arrival.times > 0 & instance$arrival.times <= current.time)
+    idx.dynamic = which(instance$arrival.times > 0)
+    n.dynamic.in.init.tour = length(which(init.tour %in% idx.dynamic))
+    front.approx$f2shifted = n.dynamic - (n.dynamic.available - front.approx$f2)
     front.approx$era = era
     front.approx$t   = current.time
+    front.approx$n.dynamic.available = n.dynamic.available
+    front.approx$n.dyn = n.dynamic
+    front.approx$n.mandatory = n.mandatory
+    front.approx$n.dynamic.in.init.tour = n.dynamic.in.init.tour
 
-    era.fronts[[era]] = front.approx
-
+    # log results
     era.results[[era]]$front = front.approx
     era.results[[era]]$init.tour = init.tour
     era.results[[era]]$result = ecr:::makeECRResult(control, log, population, fitness, stop.object)
+    era.results[[era]]$current.time = current.time
+    era.results[[era]]$n.dynamic.available = n.dynamic.available
+    era.results[[era]]$n.dynamic = n.dynamic
+    era.results[[era]]$n.mandatory = n.mandatory
+    era.results[[era]]$n.dynamic.in.init.tour = n.dynamic.in.init.tour
+    era.results[[era]]$time.passed = log$env$time.passed
 
+    # update time
     current.time = current.time + time.resolution
 
     # decision maker (get index of selected solution)
     dm.choice = decision.fun(fitness)
-    era.decisions[era] = dm.choice
 
     # get solution and fix initial tour
-    ind = population[[dm.choice]]
+    dm.ind = population[[dm.choice]]
     #FIXME: run TSP solver on DM choice
-    init.tour = findFixedTour(ind, instance, time.bound = current.time)
+    init.tour = findFixedTour(dm.ind, instance, time.bound = current.time)
+
+    era.results[[era]]$dm.choice.idx = dm.choice
+    era.results[[era]]$dm.choice.ind = dm.ind
 
     #debug <<- population
 
     catf("DM choice is: %i", dm.choice)
     catf("Decided for tour: %s", BBmisc::collapse(init.tour, sep = ", "))
     catf("Length of init tour: %i", length(init.tour))
-    catf("Serving %i mandatory and %i dynamic requests.", ind$n.mandatory, ind$n.dynamic.active)
+    catf("Serving %i mandatory and %i dynamic requests.", dm.ind$n.mandatory, dm.ind$n.dynamic.active)
 
     # if (do.pause)
     #   BBmisc::pause()
@@ -180,8 +201,6 @@ dynamicVRPEMOA = function(fitness.fun,
   } # end era loop
 
   return(list(
-    era.results = era.results,
-    era.decisions = era.decisions,
-    era.logs = do.call(rbind, era.logs)
+    era.results = era.results
   ))
 }

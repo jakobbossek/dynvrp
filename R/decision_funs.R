@@ -21,7 +21,7 @@
 #' @rdname decide
 #' @name decide
 #' @export
-decideRandom = function(fitness, ...) {
+decideRandom = function(fitness, ...) {
   n = ncol(fitness)
   sample(seq_len(n), 1L)
 }
