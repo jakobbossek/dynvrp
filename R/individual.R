@@ -11,6 +11,13 @@
 #' @param template.tour [\code{integer}]\cr
 #'   Tour used as a \dQuote{template} for a newly generated individual. Here,
 #'   we aim to pass as much information from \code{template.tour} as possible.
+#' @param init.distribution [\code{character(1)}]\cr
+#'   How shall available dynamic customers be sampled?
+#'   Option \dQuote{binomial}: each dynamic available customer is active with probability \eqn{0.5}
+#'   independently.
+#'   Option \dQuote{uniform}: if there are \eqn{n_d} available dynamic customers,
+#'   we have \eqn{P(X = i) = \frac{1}{n_d}} for \eqn{i \in \{1, \ldots, n_d}}. In a second step
+#'   \eqn{i} positions are sampled at random.
 #' @return [\code{VRPIndividual}] List with following components:
 #' \describe{
 #'   \item[\code{b}]{Binary vector of length |V| - 2. b[i] is 1, if customer i is active, i.e., in tour.}
@@ -23,7 +30,8 @@
 #'   \item[n.dynamic.inactive \code{integer(1)}]{Number of available, but not active dynamic customers i (i.e., b[i] = 0)}
 #'   \item[init.tour \code{integer}]{Fixed tour part, i.e., sequence of nodes already visited.}
 #' }
-initIndividual = function(instance, current.time = 0, init.tour = integer(), template.ind = NULL) {
+initIndividual = function(instance, current.time = 0, init.tour = integer(), template.ind = NULL, init.distribution = "binomial") {
+  checkmate::assertChoice(init.distribution, choices = c("binomial", "uniform"))
   n = salesperson::getNumberOfNodes(instance)
 
   # mandatory customers: always b = 1 and p = 0, i.e., they are
@@ -55,16 +63,19 @@ initIndividual = function(instance, current.time = 0, init.tour = integer(), tem
   # all mandatory customers are active
   ind$b[idx.mandatory] = 1L
 
-  #FIXME: might be zero
-  #FIXME: is this smart way to set this one?
-  p.denominator = n - n.mandatory - n.dynamic.available
-  if (p.denominator == 0)
-    p.denominator = 0.5
-
   #FIXME: maybe set p = 1 / n.dynamic.available?
   if (n.dynamic.available > 0L) {
     #FIXME: probs need to be 0.5
-    ind$b[idx.dynamic.available] = sample(c(0, 1), size = n.dynamic.available, replace = TRUE, prob = c(0.5, 0.5))
+    if (init.distribution == "binomial") {
+      ind$b[idx.dynamic.available] = sample(c(0, 1), size = n.dynamic.available, replace = TRUE, prob = c(0.5, 0.5))
+    } else if (init.distribution == "uniform") {
+      # how many dynamic customers shall be active?
+      n.to.activate = sample(c(0, seq_len(n.dynamic.available)), size = 1L)
+      if (n.to.activate > 0L) {
+        idx.to.activate = sample(idx.dynamic.available, size = n.to.activate)
+        ind$b[idx.to.activate] = 1L
+      }
+    }
     ind$p[idx.dynamic.available] = 1/n.dynamic.available
   }
 

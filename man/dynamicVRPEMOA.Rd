@@ -5,8 +5,10 @@
 \title{Evolutionary Multi-Objective Algorithm for dynamic routing of a vehicle.}
 \usage{
 dynamicVRPEMOA(fitness.fun, instance, time.resolution = 100L,
-  n.timeslots = NULL, decision.fun = decideRandom, do.pause = FALSE,
-  local.search.method = NULL, stop.conds = list(ecr::stopOnIters(100L)),
+  n.timeslots = NULL, decision.fun = dynvrp::decideRandom,
+  do.pause = FALSE, p.swap = 1, init.keep = TRUE,
+  local.search.method = NULL, local.search.gens = 100L,
+  init.distribution = "binomial", stop.conds = list(ecr::stopOnIters(100L)),
   mu = 50L, local.search.args = list(), lambda = mu, ...)
 }
 \arguments{
@@ -36,9 +38,20 @@ Default is \code{decideRandom}, i.e., random choice of solution.}
 Pause execution after each time slot?
 Default is \code{FALSE}.}
 
+\item{p.swap}{[\code{numeric(1)}]\cr
+Probability for swap mutation.
+Default is 1.}
+
+\item{init.keep}{[\code{logical(1)}]\cr
+Should individuals in eras \eqn{> 1} carry over information from last population?
+Default is \code{TRUE}.}
+
 \item{local.search.method}{[\code{character(1)}]\cr
 Local search algorithm. Default is \code{NULL}, i.e., no
 local search at all.}
+
+\item{local.search.gens}{[\code{numeric}]\cr
+Generations where local search should be applied.}
 
 \item{stop.conds}{[\code{list[ecr_terminator]}]\cr
 List of stopping conditions for each internal EMOA run.

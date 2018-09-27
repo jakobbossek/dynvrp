@@ -1,4 +1,4 @@
-set.seed(1)
+#set.seed(1)
 
 SOLVER.PATH = c("eax" = file.path("/Users/jboss/repositories/paper/tsp_publications/TSPAS/solvers/EAX/main"))
 salesperson::solverPaths(as.list(SOLVER.PATH))

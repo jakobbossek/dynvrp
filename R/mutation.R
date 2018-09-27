@@ -5,7 +5,7 @@
 #' may be added or removed from customer list.
 #' 2) Swap mutation on ind$b, i.e., reorder the customer permutation.
 mutVRP = ecr::makeMutator(
-  mutator = function(ind) {
+  mutator = function(ind, p.swap = 1) {
     n = length(ind$b)
 
     # flip mutation (only dynamic customers may flip)
@@ -23,7 +23,8 @@ mutVRP = ecr::makeMutator(
     }
 
     # otherwise swapping is senseless
-    if (length(idx.active.tour) >= 2L) {
+    do.swap = runif(1L) < p.swap
+    if (do.swap & (length(idx.active.tour) >= 2L)) {
 
       #FIXME: magic number
       for (i in 1:5) {

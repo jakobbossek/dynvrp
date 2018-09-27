@@ -4,7 +4,7 @@
 \alias{mutVRP}
 \title{Mutation operator.}
 \usage{
-mutVRP(ind)
+mutVRP(ind, p.swap = 1)
 }
 \description{
 Performs two consecutive mutation steps:

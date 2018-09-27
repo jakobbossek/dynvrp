@@ -21,6 +21,11 @@ findHamiltonianPath = function(
   start.id = 1L,
   dest.id = 2L) {
 
+  # nothing to do: start->node->end is the only option
+  if (length(active.nodes) <= 3L) {
+    return(active.nodes)
+  }
+
   # get information from source instance
   dist.mat = instance$dmat
   coords = instance$coords
@@ -41,7 +46,7 @@ findHamiltonianPath = function(
 
   # depots are always stored as the first two cities/nodes in reduced distance matrix!
   # remove this nodes from the distance matrix and generate ATSP
-  atsp = TSP::ATSP(dist.mat[-c(1L, 2L), -c(1L, 2L)])
+  atsp = TSP::ATSP(dist.mat[-c(1L, 2L), -c(1L, 2L), drop = FALSE])
 
   # insert dummy city with label sd (sd for start/dest) ...
   atsp = TSP::insert_dummy(atsp, label = "sd")
