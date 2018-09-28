@@ -4,7 +4,8 @@
 \alias{initIndividual}
 \title{Initialize individual.}
 \usage{
-initIndividual(instance, current.time = 0, init.tour = integer())
+initIndividual(instance, current.time = 0, init.tours = integer(),
+  n.vehicles = 1L, template.ind = NULL, init.distribution = "binomial")
 }
 \arguments{
 \item{instance}{[\code{\link[salesperson]{Network}}]\cr
@@ -17,6 +18,10 @@ Default is 0.}
 \item{init.tour}{[\code{integer}]\cr
 Fixed prefix tour, i.e., part of tour which is already fixed,
 because time passed and vehicle already visited some customers.}
+
+\item{template.tour}{[\code{integer}]\cr
+Tour used as a \dQuote{template} for a newly generated individual. Here,
+we aim to pass as much information from \code{template.tour} as possible.}
 }
 \value{
 [\code{VRPIndividual}] List with following components:
@@ -29,6 +34,6 @@ because time passed and vehicle already visited some customers.}
   \item[idx.dynamic.available \code{integer}]{IDs/positions of dynamic customers which already requested serving.}
   \item[n.dynamic.active \code{integer(1)}]{Number of active dynamic customers i (i.e., b[i] = 1)}
   \item[n.dynamic.inactive \code{integer(1)}]{Number of available, but not active dynamic customers i (i.e., b[i] = 0)}
-  \item[init.tour \code{integer}]{Fixed tour part, i.e., sequence of nodes already visited.}
+  \item[init.tours \code{integer}]{Fixed tour part, i.e., sequence of nodes already visited.}
 }
 }

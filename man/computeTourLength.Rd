@@ -4,7 +4,7 @@
 \alias{computeTourLength}
 \title{Helper for tour length computation.}
 \usage{
-computeTourLength(ind, instance)
+computeTourLength(ind, instance, vehicle = 1L)
 }
 \arguments{
 \item{ind}{[\code{VRPIndividual}]\cr

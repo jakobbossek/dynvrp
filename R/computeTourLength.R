@@ -7,7 +7,7 @@
 #'   and distance matrix with start and end depot!
 #' @return [\code{numeric(1)}]
 #' @seealso fitness.fun
-computeTourLength = function(ind, instance) {
+computeTourLength = function(ind, instance, vehicle = 1L) {
   assertClass(ind, "VRPIndividual")
   assertClass(instance, "Network")
 
@@ -15,15 +15,15 @@ computeTourLength = function(ind, instance) {
   tour.length = 0
 
   # get permutation without depots (only active customers)
-  idx.tour = which(ind$b == 1L)
+  idx.tour = which(ind$b == 1L & ind$v == vehicle)
   idx.tour = sort(which(ind$t %in% idx.tour))
   permutation = ind$t[idx.tour]
   #permutation = ind$t[ind$b == 1L]
 
   # we need to reorder permutation if some parts are already visited
-  if (length(ind$init.tour) > 0L) {
-    non.fixed = permutation[!(permutation %in% ind$init.tour)]
-    permutation = c(ind$init.tour, non.fixed)
+  if (length(ind$init.tours[[vehicle]]) > 0L) {
+    non.fixed = permutation[!(permutation %in% ind$init.tours[[vehicle]])]
+    permutation = c(ind$init.tours[[vehicle]], non.fixed)
   }
 
   # shift customer IDs/positions (depots are encoded as customoers 1 and 2 in instance)
