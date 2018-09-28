@@ -23,7 +23,7 @@
 #'   \item[n.dynamic.inactive \code{integer(1)}]{Number of available, but not active dynamic customers i (i.e., b[i] = 0)}
 #'   \item[init.tour \code{integer}]{Fixed tour part, i.e., sequence of nodes already visited.}
 #' }
-initIndividual = function(instance, current.time = 0, init.tour = integer(), template.ind = NULL) {
+initIndividual = function(instance, current.time = 0, init.tour = integer(), n.vehicles = 1L, template.ind = NULL) {
   n = salesperson::getNumberOfNodes(instance)
 
   # mandatory customers: always b = 1 and p = 0, i.e., they are
@@ -49,7 +49,8 @@ initIndividual = function(instance, current.time = 0, init.tour = integer(), tem
     n.mandatory = n.mandatory,
     n.dynamic.available = n.dynamic.available,
     idx.dynamic.available = idx.dynamic.available,
-    init.tour = init.tour
+    init.tour = init.tour,
+    n.vehicles = n.vehicles
   )
 
   # all mandatory customers are active

@@ -12,6 +12,9 @@
 #'   Number of time steps.
 #'   If \code{NULL} (default), the value is computed via (max. request time
 #'   of dynamic customers of \code{instance} / time.resolution.
+#' @param n.vehicles [\code{integer(1)}]\cr
+#'   The number of vehicles.
+#'   Default is 1.
 #' @param decision.fun [\code{function(fitness, ...)}]\cr
 #'   Function used to make decision after each time slot.
 #'   May be used for interactive decision or decision maker simulation (e.g.,
@@ -45,6 +48,7 @@ dynamicVRPEMOA = function(fitness.fun,
   instance,
   time.resolution = 100L,
   n.timeslots = NULL,
+  n.vehicles = 1L,
   decision.fun = dynvrp::decideRandom,
   do.pause = FALSE,
   init.keep = TRUE,
@@ -62,9 +66,12 @@ dynamicVRPEMOA = function(fitness.fun,
   assertList(stop.conds)
   assertChoice(local.search.method, choices = c("eax", "lkh"), null.ok = TRUE)
 
+  if (init.keep & n.vehicles > 1L)
+    BBmisc::stopf("[dynamicVRPEMOA] Currently init.keep is not supported if >1 vehicles are available.")
+
+  n.vehicles = asInt(n.vehicles, lower = 1L)
   mu = asInt(mu, lower = 5L)
   lambda = asInt(lambda, lower = 5L)
-
 
   # preprocessing
   max.time = max(instance$arrival.times)
@@ -82,7 +89,7 @@ dynamicVRPEMOA = function(fitness.fun,
   control = ecr::registerECROperator(control, slot = "selectForMating", ecr::selSimple)
   control = ecr::registerECROperator(control, slot = "selectForSurvival", ecr::selNondom)
 
-  init.tour = integer()
+  init.tour = lapply(seq_len(n.vehicles), function(i) integer())
   era.results = vector(mode = "list", length = n.timeslots)
   stop.object = NA
 
@@ -91,10 +98,10 @@ dynamicVRPEMOA = function(fitness.fun,
 
     # init EMOA
     population = if (!init.keep | current.time == 0) {
-      ecr::gen(initIndividual(instance, init.tour = init.tour, current.time = current.time), mu)
+      ecr::gen(initIndividual(instance, init.tour = init.tour, current.time = current.time, n.vehicles = n.vehicles), mu)
     } else {
       lapply(population, function(template.ind) {
-        initIndividual(instance, init.tour = init.tour, current.time = current.time, template.ind = template.ind)
+        initIndividual(instance, init.tour = init.tour, current.time = current.time, n.vehicles = n.vehicles, template.ind = template.ind)
       })
     }
     fitness = ecr::evaluateFitness(control, population, instance = instance)
@@ -153,7 +160,12 @@ dynamicVRPEMOA = function(fitness.fun,
     # This is needed for visualization within scatterplots with the ILP and a posteriori stuff.
     n.dynamic.available = sum(instance$arrival.times > 0 & instance$arrival.times <= current.time)
     idx.dynamic = which(instance$arrival.times > 0)
-    n.dynamic.in.init.tour = length(which(init.tour %in% idx.dynamic))
+
+    # go through all initial tours and count the number of dynamic
+    #FIXME: this can be done more efficiently!
+    n.dynamic.in.init.tour = sum(sapply(seq_len(n.vehicles), function(i) {
+      length(which(init.tours[[i]] %in% idx.dynamic))
+    }))
     front.approx$f2shifted = n.dynamic - (n.dynamic.available - front.approx$f2)
     front.approx$era = era
     front.approx$t   = current.time
@@ -164,7 +176,7 @@ dynamicVRPEMOA = function(fitness.fun,
 
     # log results
     era.results[[era]]$front = front.approx
-    era.results[[era]]$init.tour = init.tour
+    era.results[[era]]$init.tours = init.tours
     era.results[[era]]$result = ecr:::makeECRResult(control, log, population, fitness, stop.object)
     era.results[[era]]$current.time = current.time
     era.results[[era]]$n.dynamic.available = n.dynamic.available
@@ -182,7 +194,7 @@ dynamicVRPEMOA = function(fitness.fun,
     # get solution and fix initial tour
     dm.ind = population[[dm.choice]]
     #FIXME: run TSP solver on DM choice
-    init.tour = findFixedTour(dm.ind, instance, time.bound = current.time)
+    init.tours = findFixedTour(dm.ind, instance, time.bound = current.time)
 
     era.results[[era]]$dm.choice.idx = dm.choice
     era.results[[era]]$dm.choice.ind = dm.ind
