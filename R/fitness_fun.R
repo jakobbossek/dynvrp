@@ -16,3 +16,11 @@
 fitness.fun = function(ind, instance) {
   return(c(computeTourLength(ind, instance), ind$n.dynamic.inactive))
 }
+
+# Minimize the number of unserved customers and the maximum tour length of the vehicles.
+fitness.fun2 = function(ind, instance) {
+  tour.length = sapply(seq_len(ind$n.vehicles), function(v) {
+    computeTourLength(ind, instance, vehicle = v)
+  })
+  return(c(max(tour.length), ind$n.dynamic.inactive))
+}

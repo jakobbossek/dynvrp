@@ -39,7 +39,7 @@
 #'   Option \dQuote{binomial}: each dynamic available customer is active with probability \eqn{0.5}
 #'   independently.
 #'   Option \dQuote{uniform}: if there are \eqn{n_d} available dynamic customers,
-#'   we have \eqn{P(X = i) = \frac{1}{n_d}} for \eqn{i \in \{1, \ldots, n_d}}. In a second step
+#'   we have \eqn{P(X = i) = \frac{1}{n_d}} for \eqn{i \in \{1, \ldots, n_d\}}. In a second step
 #'   \eqn{i} positions are sampled at random.
 #' @param stop.conds [\code{list[ecr_terminator]}]\cr
 #'   List of stopping conditions for each internal EMOA run.
@@ -184,7 +184,7 @@ dynamicVRPEMOA = function(fitness.fun,
 
     # log results
     era.results[[era]]$front = front.approx
-    era.results[[era]]$init.tours = init.tours
+    era.results[[era]]$init.tours = lapply(init.tours, function(it) c(1, it + 2L))
     era.results[[era]]$result = ecr:::makeECRResult(control, log, population, fitness, stop.object)
 
     # update time

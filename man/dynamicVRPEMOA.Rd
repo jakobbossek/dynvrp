@@ -57,6 +57,14 @@ local search at all.}
 \item{local.search.gens}{[\code{numeric}]\cr
 Generations where local search should be applied.}
 
+\item{init.distribution}{[\code{character(1)}]\cr
+How shall available dynamic customers be sampled?
+Option \dQuote{binomial}: each dynamic available customer is active with probability \eqn{0.5}
+independently.
+Option \dQuote{uniform}: if there are \eqn{n_d} available dynamic customers,
+we have \eqn{P(X = i) = \frac{1}{n_d}} for \eqn{i \in \{1, \ldots, n_d\}}. In a second step
+\eqn{i} positions are sampled at random.}
+
 \item{stop.conds}{[\code{list[ecr_terminator]}]\cr
 List of stopping conditions for each internal EMOA run.
 Default is to stop after 100 generations.}

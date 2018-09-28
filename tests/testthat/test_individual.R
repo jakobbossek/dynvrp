@@ -18,7 +18,7 @@ test_that("Initialization produces valid individuals", {
     init.tour = sample(idx.mandatory, size = n.fixed, replace = FALSE)
 
     ind = initIndividual(instance, init.tour = init.tour)
-    ind.tour = getTourFromIndividual(ind)
+    ind.tour = getToursFromIndividual(ind)[[1L]]
     expect_true(all((init.tour + 2L) == ind.tour[seq_len(n.fixed)]))
   }
 
@@ -33,7 +33,7 @@ test_that("Initialization produces valid individuals", {
     init.tour = sample(idx.customers, size = n.fixed, replace = FALSE)
 
     ind = initIndividual(instance, current.time = current.time, init.tour = init.tour)
-    ind.tour = getTourFromIndividual(ind)
+    ind.tour = getToursFromIndividual(ind)[[1L]]
     expect_true(all((init.tour + 2L) == ind.tour[seq_len(n.fixed)]))
   }
 
