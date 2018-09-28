@@ -14,21 +14,6 @@ toVRPInstance = function(instance) {
   return(instance)
 }
 
-#FIXME: we need another option to select only customers with p > 0 for crossover
-# condenseTour = function(ind, only.active) {
-#   idx.active = if (only.active)
-#     which(ind$b == 1L)
-#   else
-#     which(ind$b == 1L & ind$p > 0)
-
-#   # otherwise swapping is senseless
-#   if (length(idx.active) >= 2L) {
-#     # mapping to tour vector
-#     return(sort(which(ind$t %in% idx.active)))
-#   }
-#   return(integer())
-# }
-
 #' @title Find tour prefix of already visited customers.
 #'
 #' @param ind [\code{VRPIndividual}]\cr
@@ -49,11 +34,9 @@ findFixedTour = function(ind, instance, time.bound) {
 
   fixed.tours = lapply(seq_len(ind$n.vehicles), function(v) {
     # get permutation without depots (only active customers)
-    #FIXME: this is wrong!!! b[i] does not correspond to t[i] but i in t
     idx.tour = which(ind$b == 1L & ind$v == v)
     idx.tour = sort(which(ind$t %in% idx.tour))
     permutation = ind$t[idx.tour]
-    #permutation = ind$t[ind$b == 1L]
 
     # we need to reorder permutation if some parts are already visited
     if (length(ind$init.tours[[v]]) > 0L) {
