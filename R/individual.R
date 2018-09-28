@@ -127,7 +127,16 @@ getTourFromIndividual = function(ind, ...) {
   idx.active = which(ind$b == 1L)
   idx.tour = sort(which(ind$t %in% idx.active))
 
+  tour = ind$t[idx.tour]
+
+  # we need to reorder permutation if some parts are already visited
+  if (length(ind$init.tour) > 0L) {
+    non.fixed = tour[!(tour %in% ind$init.tour)]
+    tour = c(ind$init.tour, non.fixed)
+  }
+
   # +2 since we are 1-based in encoding and 1 and 2 are the depots
-  tour = ind$t[idx.tour] + 2L
+  tour = tour + 2L
+
   return(tour)
 }

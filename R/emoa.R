@@ -170,7 +170,7 @@ dynamicVRPEMOA = function(fitness.fun,
     front.approx$era = era
 
     # log results
-    era.results[[era]]$init.tour = init.tour
+    era.results[[era]]$init.tour = init.tour + 2L
     era.results[[era]]$result = ecr:::makeECRResult(control, log, population, fitness, stop.object)
 
     # update time
@@ -201,7 +201,8 @@ dynamicVRPEMOA = function(fitness.fun,
       n.dynamic.lower.bound = n.dynamic - n.dynamic.available,
       n.dynamic.in.init.tour = n.dynamic.in.init.tour,
       time.passed = log$env$time.passed,
-      init.tour = BBmisc::collapse(c(1, init.tour)),
+      # need to add 1
+      init.tour = BBmisc::collapse(c(1, init.tour + 2L)),
       dm.tour = BBmisc::collapse(c(1, getTourFromIndividual(dm.ind), 2))
     )
     #debug <<- population

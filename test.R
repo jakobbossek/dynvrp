@@ -33,10 +33,10 @@ st = proc.time()
 emoa.res = dynamicVRPEMOA(
   fitness.fun, decision.fun = decideRank(1L, 0), instance = instance,
   mu = 10L, lambda = 5L,
-  local.search.method = "eax",
+  local.search.method = NULL,
   local.search.gens = c(100),
-  init.keep = TRUE,
-  stop.conds = list(ecr::stopOnIters(100)),
+  init.keep = FALSE,
+  stop.conds = list(ecr::stopOnIters(1000)),
   #n.timeslots = 8L
   )
 time.passed = proc.time() - st
