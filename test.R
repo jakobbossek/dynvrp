@@ -38,10 +38,10 @@ emoa.res2 = dynamicVRPEMOA(
   mu = 10L, lambda = 5L,
   n.vehicles = 3L,
   p.swap = 0.8,
-  local.search.method = NULL,
+  local.search.method = "eax",
   local.search.gens = c(100),
   init.keep = FALSE,
-  stop.conds = list(ecr::stopOnIters(10000)),
+  stop.conds = list(ecr::stopOnIters(100)),
   n.timeslots = 3L
   )
 time.passed = proc.time() - st
@@ -57,15 +57,21 @@ fronts = emoa.res2$pareto.front
 max.era = max(fronts$era)
 
 dm.ind = emoa.res2$era.results[[max.era]]$dm.choice.ind
-dm.ind.tour = getToursFromIndividual(dm.ind, append.depots = TRUE)
-names(dm.ind.tour) = paste0("vehicle", 1:dm.ind$n.vehicles)
+dm.ind.tours = getToursFromIndividual(dm.ind, append.depots = TRUE)
+dm.init.tours = getInitToursFromIndividual(dm.ind, append.depot = TRUE)
+names(dm.ind.tours) = paste0("vehicle", 1:dm.ind$n.vehicles)
 
-pl.instance = autoplot(instance, path = dm.ind.tour)
+pl.instance = autoplot(instance, path = dm.ind.tours)
 idx.man = which(instance$arrival.times == 0)
 pl.instance = pl.instance + geom_point(data = as.data.frame(instance$coordinates[idx.man, ]), colour = "red")
 
 print(pl.instance)
 #gridExtra::grid.arrange(pl.instance, pl.fronts, nrow = 1L)
+
+source("R/visualization.R")
+pl = plotNetworkFancy(instance, time.resolution = 250L,
+  tours = list("1" = dm.ind.tours, "3" = dm.ind.tours),
+  init.tours = list("1" = dm.init.tours, "3" = dm.init.tours))
 
 
 stop("Done :)")
