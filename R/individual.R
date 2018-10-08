@@ -156,3 +156,13 @@ getToursFromIndividual = function(ind, append.depots = FALSE, ...) {
     return(tour)
   })
 }
+
+getInitToursFromIndividual = function(ind, append.depot = FALSE, ...) {
+  lapply(ind$init.tours, function(it) {
+    it = it + 2L
+    if (append.depot) {
+      it = c(1L, it)
+    }
+    return(it)
+  })
+}

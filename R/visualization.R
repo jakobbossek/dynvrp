@@ -1,3 +1,120 @@
+plotNetworkFancy = function(instance,
+  time.resolution,
+  tours = NULL,
+  init.tours = NULL,
+  customers.by.era = TRUE,
+  highlight.depots = TRUE,
+  desaturate.nonvisited = TRUE) {
+
+  checkmate::assertClass(instance, "Network")
+  checkmate::checkNumber(time.resolution, lower = 1)
+  checkmate::assertFlag(customers.by.era)
+
+  df = as.data.frame(instance, include.extras = TRUE)
+  print(head(df))
+
+  # if (!is.null(tours))
+  #   checkmate::assertList(tours, types = "numeric")
+  # if (!is.null(init.tours))
+  #   checkmate::assertList(tours, types = "numeric")
+
+  if (!is.null(tours) && !is.null(init.tours) && length(tours) != length(init.tours))
+    BBmisc::stopf("[plotNetworkFancy] tours and init.tours need to be of same length.")
+
+  if (is.null(instance$arrival.times))
+    BBmisc::stopf("[plotNetworkFancy] Network needs to be dynamic.")
+
+  # determine number of eras
+  max.arrival.time = max(instance$arrival.times)
+  n.eras = ceiling(max.arrival.time / time.resolution) + 1L
+  n.vehicles = length(tours[[1L]])
+
+  eras.to.show = as.integer(names(tours))
+
+  if (any(eras.to.show > n.eras))
+    BBmisc::stopf("[plotNetworkFancy] There are %i eras with time resolution %i, but
+      eras to show are %s", n.eras, time.resolution, BBmisc::collapse(eras.to.show, sep = ", "))
+
+  tour.grid = expand.grid(era = eras.to.show, vehicle = seq_len(n.vehicles))
+
+  print(tour.grid)
+  df.tours = lapply(seq_len(nrow(tour.grid)), function(i) {
+    era = tour.grid[i, 1L]
+    vehicle = tour.grid[i, 2L]
+    tour = tours[[as.character(era)]][[vehicle]]
+    tour.coords = df[tour, , drop = FALSE]
+    tour.coords$era = era
+    tour.coords$vehicle = vehicle
+    return(tour.coords)
+  })
+  df.tours = do.call(rbind, df.tours)
+
+  df.init.tours = lapply(seq_len(nrow(tour.grid)), function(i) {
+    era = tour.grid[i, 1L]
+    vehicle = tour.grid[i, 2L]
+    tour = init.tours[[as.character(era)]][[vehicle]]
+    tour.coords = df[tour, , drop = FALSE]
+    tour.coords$era = era
+    tour.coords$vehicle = vehicle
+    return(tour.coords)
+  })
+  df.init.tours = do.call(rbind, df.init.tours)
+
+  # categorize customers by era
+  arrival.times = c(0, 0, instance$arrival.times)
+  df$era2 = cut(arrival.times,
+    breaks = (c(0, seq_len(n.eras - 1L))) * time.resolution,
+    labels = seq_len(n.eras - 1L),
+    right = FALSE)
+
+  # if (!is.null(tours)) {
+  #   visited = unique(unlist(tours))
+  #   df[visited, "visited"] = 1.0
+  #   df[!visited, "visited"] = 0.5
+  # }
+
+  df = do.call(rbind, lapply(eras.to.show, function(era) {
+    tmp = df[as.integer(df$era2) <= era, , drop = FALSE]
+    tmp$era = era
+    return(tmp)
+  }))
+
+
+  print(head(df))
+  print(table(df$visited))
+
+  pl = ggplot(data = df, aes(x = x1, y = x2))
+  pl = pl + geom_path(data = df.tours)
+  if (!is.null(init.tours)) {
+    pl = pl + geom_path(data = df.init.tours, size = 2.2, alpha = 0.6)
+  }
+  if (customers.by.era) {
+    if (desaturate.nonvisited) {
+      pl = pl + geom_point(aes(colour = era2))#, alpha = visited))
+    } else {
+      pl = pl + geom_point(aes(colour = era2))
+    }
+  } else {
+    pl = pl + geom_point()
+  }
+
+  if (highlight.depots) {
+    df.depots = df[df$types == "depot", , drop = FALSE]
+    pl = pl + geom_point(data = df.depots, aes(colour = NULL), colour = "black", size = 2.6)
+    pl = pl + geom_point(data = df.depots, aes(colour = NULL), colour = "white", size = 2.2)
+  }
+
+  pl = pl + facet_grid(. ~ era + vehicle, labeller = label_both)
+
+  pl = pl + labs(
+    colour = "Era",
+    x = "", y = ""
+  )
+  pl = pl + viridis::scale_colour_viridis(discrete = TRUE, end = 0.85)
+  return(pl)
+}
+
+
 plotEras = function(fronts, current.era, current.time, a.posteriori.approx = NULL, selected = NULL) {
   assertList(fronts)
   assertNumber(current.era, lower = 1L)
@@ -33,105 +150,105 @@ plotEras = function(fronts, current.era, current.time, a.posteriori.approx = NUL
   return(pl)
 }
 
-plotNetworkFancy = function(object,
-  path = NULL, close.path = FALSE, path.colour = "gray",
-  current.time = Inf,
-  last.time = NULL,
-  ...) {
-  if (!is.null(path)) {
-    if (!testNumeric(path, min.len = 2L, any.missing = FALSE) & !testList(path, min.len = 2L, any.missing = FALSE)) {
-      stopf("Path argument needs to be a vector or a list.")
-    }
-  }
-  assertString(path.colour, na.ok = FALSE)
-  assertFlag(close.path, na.ok = FALSE)
+# plotNetworkFancy = function(object,
+#   path = NULL, close.path = FALSE, path.colour = "gray",
+#   current.time = Inf,
+#   last.time = NULL,
+#   ...) {
+#   if (!is.null(path)) {
+#     if (!testNumeric(path, min.len = 2L, any.missing = FALSE) & !testList(path, min.len = 2L, any.missing = FALSE)) {
+#       stopf("Path argument needs to be a vector or a list.")
+#     }
+#   }
+#   assertString(path.colour, na.ok = FALSE)
+#   assertFlag(close.path, na.ok = FALSE)
 
-  if (ncol(object$coordinates) > 2L) {
-    stopf("Only 2-dimensional networks can be plotted.")
-  }
+#   if (ncol(object$coordinates) > 2L) {
+#     stopf("Only 2-dimensional networks can be plotted.")
+#   }
 
-  df = as.data.frame(object, include.extras = TRUE)
+#   df = as.data.frame(object, include.extras = TRUE)
 
-  if (testClass(object, "ClusteredNetwork")) {
-    df$membership = as.factor(df$membership)
-  }
+#   if (testClass(object, "ClusteredNetwork")) {
+#     df$membership = as.factor(df$membership)
+#   }
 
-  if (!is.null(object$arrival.times)) {
-    arrival.times = c(0, 0, object$arrival.times)
-    df$customer = "mandatory"
-    df$customer[arrival.times > 0] = "dynamic"
+#   if (!is.null(object$arrival.times)) {
+#     arrival.times = c(0, 0, object$arrival.times)
+#     df$customer = "mandatory"
+#     df$customer[arrival.times > 0] = "dynamic"
 
-    if (!is.null(last.time)) {
-      df$customer[arrival.times <= current.time & arrival.times > last.time & df$customer == "dynamic"] = "NEW"
-    }
-  }
+#     if (!is.null(last.time)) {
+#       df$customer[arrival.times <= current.time & arrival.times > last.time & df$customer == "dynamic"] = "NEW"
+#     }
+#   }
 
-  if (hasDepots(object)) {
-    depot.idx = which(df$types == "depot")
-    df.depots = df[depot.idx, , drop = FALSE]
-  }
+#   if (hasDepots(object)) {
+#     depot.idx = which(df$types == "depot")
+#     df.depots = df[depot.idx, , drop = FALSE]
+#   }
 
-  # handle arrival times
-  df2 = df
-  if (!is.null(object$arrival.times)) {
-    arrival.times = c(0, 0, object$arrival.times)
-    df2 = df2[which(arrival.times <= current.time), , drop = FALSE]
-  }
+#   # handle arrival times
+#   df2 = df
+#   if (!is.null(object$arrival.times)) {
+#     arrival.times = c(0, 0, object$arrival.times)
+#     df2 = df2[which(arrival.times <= current.time), , drop = FALSE]
+#   }
 
 
-  print(head(df2))
+#   print(head(df2))
 
-  if (is.list(path)) {
-    n = nrow(df)
-    df = df[rep(seq_len(n), length(path)), ]
-    ns = if (!is.null(names(path))) names(path) else as.character(seq_len(length(path)))
-    df$Path = rep(ns, each = n)
-  }
+#   if (is.list(path)) {
+#     n = nrow(df)
+#     df = df[rep(seq_len(n), length(path)), ]
+#     ns = if (!is.null(names(path))) names(path) else as.character(seq_len(length(path)))
+#     df$Path = rep(ns, each = n)
+#   }
 
-  pl = ggplot(data = df2, mapping = aes_string(x = "x1", y = "x2"))
+#   pl = ggplot(data = df2, mapping = aes_string(x = "x1", y = "x2"))
 
-  # facets if multiple paths given
-  if (is.list(path)) {
-    pl = pl + facet_grid(. ~ Path)
-  }
+#   # facets if multiple paths given
+#   if (is.list(path)) {
+#     pl = pl + facet_grid(. ~ Path)
+#   }
 
-  if (!is.null(path)) {
-    # if we have a list of pathes
-    if (is.list(path)) {
-      # sequentially build pathes (one path per facet)
-      path.coords = data.frame()
-      for (i in seq_len(length(path))) {
-        p = path[[i]]
-        pname = names(path)[i]
-        if (close.path) {
-          p = c(p, p[1])
-        }
-        the.path.coords = df[p, , drop = FALSE]
-        the.path.coords$Path = pname
-        path.coords = rbind(path.coords, the.path.coords)
-      }
-    } else {
-      # do the same as above only for one path
-      if (close.path) {
-        path = c(path, path[1])
-      }
-      path.coords = df[path, , drop = FALSE]
-    }
-    pl = pl + geom_path(data = path.coords, colour = path.colour)
-  }
+#   if (!is.null(path)) {
+#     # if we have a list of pathes
+#     if (is.list(path)) {
+#       # sequentially build pathes (one path per facet)
+#       path.coords = data.frame()
+#       for (i in seq_len(length(path))) {
+#         p = path[[i]]
+#         pname = names(path)[i]
+#         if (close.path) {
+#           p = c(p, p[1])
+#         }
+#         the.path.coords = df[p, , drop = FALSE]
+#         the.path.coords$Path = pname
+#         path.coords = rbind(path.coords, the.path.coords)
+#       }
+#     } else {
+#       # do the same as above only for one path
+#       if (close.path) {
+#         path = c(path, path[1])
+#       }
+#       path.coords = df[path, , drop = FALSE]
+#     }
+#     pl = pl + geom_path(data = path.coords, colour = path.colour)
+#   }
 
-  if (!is.null(df2$customer)) {
-    pl = pl + geom_point(aes_string(colour = "customer"))
-  } else {
-    pl = pl + geom_point(colour = "black")
-  }
+#   if (!is.null(df2$customer)) {
+#     pl = pl + geom_point(aes_string(colour = "customer"))
+#   } else {
+#     pl = pl + geom_point(colour = "black")
+#   }
 
-  if (hasDepots(object)) {
-    pl = pl + geom_point(data = df.depots, colour = "black", size = 4)
-    pl = pl + geom_point(data = df.depots, colour = "white", size = 3)
-  }
-  pl = pl + ggtitle(as.character(object))
-  #pl = salesperson:::decorateGGPlot(pl, lower = object$lower, upper = object$upper)
-  return(pl)
-}
+#   if (hasDepots(object)) {
+#     pl = pl + geom_point(data = df.depots, colour = "black", size = 4)
+#     pl = pl + geom_point(data = df.depots, colour = "white", size = 3)
+#   }
+#   pl = pl + ggtitle(as.character(object))
+#   #pl = salesperson:::decorateGGPlot(pl, lower = object$lower, upper = object$upper)
+#   return(pl)
+# }
 
