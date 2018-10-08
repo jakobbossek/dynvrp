@@ -16,7 +16,7 @@
 #'   Option \dQuote{binomial}: each dynamic available customer is active with probability \eqn{0.5}
 #'   independently.
 #'   Option \dQuote{uniform}: if there are \eqn{n_d} available dynamic customers,
-#'   we have \eqn{P(X = i) = \frac{1}{n_d}} for \eqn{i \in \{1, \ldots, n_d}}. In a second step
+#'   we have \eqn{P(X = i) = \frac{1}{n_d}} for \eqn{i \in \{1, \ldots, n_d\}}. In a second step
 #'   \eqn{i} positions are sampled at random.
 #' @return [\code{VRPIndividual}] List with following components:
 #' \describe{
