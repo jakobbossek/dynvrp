@@ -6,14 +6,14 @@ This repository contains the implementation of a dynamic evolutionary multi-obje
 
 In previous work we developed and studied an a posteriori version of the EMOA where all dynamic requests were known in advance.
 
-> Jakob Bossek, Christian Grimme, Stephan Meisel, Gu ̈nter Rudolph, and Heike Trautmann. Local
+> Jakob Bossek, Christian Grimme, Stephan Meisel, Günter Rudolph, and Heike Trautmann. Local
 > Search Effects in Bi-objective Orienteering. In Proceedings of the Genetic and Evolutionary
-> Computation Conference, GECCO ’18, pages 585– 592, New York, NY, USA, 2018. ACM.
+> Computation Conference, GECCO ’18, pages 585-592, New York, NY, USA, 2018. ACM.
 
-> Stephan Meisel, Christian Grimme, Jakob Bossek, Martin Wo ̈lck, Gu ̈nter Rudolph, and Heike
+> Stephan Meisel, Christian Grimme, Jakob Bossek, Martin Wölck, Günter Rudolph, and Heike
 > Trautmann. Evaluation of a Multi-Objective EA on Benchmark In- stances for Dynamic Routing of
 > a Vehicle. In Proceedings of the 2015 Annual Conference on Genetic and Evolutionary
-> Computation, GECCO ’15, pages 425– 432, New York, NY, USA, 2015. ACM.
+> Computation, GECCO ’15, pages 425-432, New York, NY, USA, 2015. ACM.
 
 ## Contact
 
