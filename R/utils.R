@@ -18,7 +18,7 @@ toVRPInstance = function(instance) {
 #'
 #' @param ind [\code{VRPIndividual}]\cr
 #'   Individual.
-#' @param instance [\code{\link[salesperson]{Network}}]\cr
+#' @param instance [\code{Network}]\cr
 #'   Network object.
 #' @param time.bound [\code{numeric(1)}]\cr
 #'   Current time. This is relevant since the prefix tour is composed

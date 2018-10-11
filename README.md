@@ -1,17 +1,23 @@
 # dynvrp
 
-[![CRAN Status Badge](http://www.r-pkg.org/badges/version/ecr)](http://cran.r-project.org/web/packages/ecr)
-[![CRAN Downloads](http://cranlogs.r-pkg.org/badges/ecr)](http://cran.rstudio.com/web/packages/ecr/index.html)
-[![CRAN Downloads](http://cranlogs.r-pkg.org/badges/grand-total/ecr?color=orange)](http://cran.rstudio.com/web/packages/ecr/index.html)
-[![Build Status](https://travis-ci.org/jakobbossek/ecr2.svg?branch=master)](https://travis-ci.org/jakobbossek/ecr2)
-[![Build status](https://ci.appveyor.com/api/projects/status/eu0nns2dsgocwntw/branch/master?svg=true)](https://ci.appveyor.com/project/jakobbossek/ecr2/branch/master)
-[![Coverage Status](https://coveralls.io/repos/github/jakobbossek/ecr2/badge.svg?branch=master)](https://coveralls.io/github/jakobbossek/ecr2?branch=master)
-[![Research software impact](http://depsy.org/api/package/cran/ecr/badge.svg)](http://depsy.org/package/r/ecr)
+This repository contains the implementation of a dynamic evolutionary multi-objective algorithm for a bi-objective orienteering where the goal is to minimize the length of the tour traveled by a single vehicle and maximize the number of dynamic customer requests which arrive as time passes by.
 
+## Previous work
+
+In previous work we developed and studied an a posteriori version of the EMOA where all dynamic requests were known in advance.
+
+> Jakob Bossek, Christian Grimme, Stephan Meisel, Günter Rudolph, and Heike Trautmann. Local
+> Search Effects in Bi-objective Orienteering. In Proceedings of the Genetic and Evolutionary
+> Computation Conference, GECCO ’18, pages 585-592, New York, NY, USA, 2018. ACM.
+
+> Stephan Meisel, Christian Grimme, Jakob Bossek, Martin Wölck, Günter Rudolph, and Heike
+> Trautmann. Evaluation of a Multi-Objective EA on Benchmark In- stances for Dynamic Routing of
+> a Vehicle. In Proceedings of the 2015 Annual Conference on Genetic and Evolutionary
+> Computation, GECCO ’15, pages 425-432, New York, NY, USA, 2015. ACM.
 
 ## Contact
 
-Please address questions and missing features about the **ecr** to the author Jakob Bossek <j.bossek@gmail.com>. Found some nasty bugs? Please use the [issue tracker](https://github.com/jakobbossek/ecr2/issues) for this. Pay attention to explain the problem as good as possible. At its best you provide an example, so I can reproduce your problem quickly.
+Please address questions and missing features about the **ecr** to the author Jakob Bossek <j.bossek@gmail.com>. Found some nasty bugs? Please use the [issue tracker](https://github.com/jakobbossek/dynvrp/issues) for this. Pay attention to explain the problem as good as possible. At its best you provide an example, so I can reproduce your problem quickly.
 
 
 

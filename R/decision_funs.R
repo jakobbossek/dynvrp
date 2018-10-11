@@ -11,10 +11,12 @@
 #' and a quantile and the corresponding elements ordered by the selected objective
 #' is chosen.
 #'
-#' @param fitness [matrix]\cr
+#' @param fitness [\code{matrix}]\cr
 #'   Fitness matrix where each column represents one non-dominated solution.
-#' @param q [\numeric(1)]\cr
+#' @param q [\code{numeric(1)}]\cr
 #'   Numeric values in \eqn{[0, 1]}. Used by \code{decideRank}.
+#' @param obj [\code{integer(1)}]\cr
+#'   Objective to use.
 #' @param ... [any]\cr
 #'   Not used at the moment.
 #' @return [integer(1)] Index, i.e., column number, of solution to decide for.

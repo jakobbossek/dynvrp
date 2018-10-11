@@ -8,7 +8,7 @@ initIndividual(instance, current.time = 0, init.tours = integer(),
   n.vehicles = 1L, template.ind = NULL, init.distribution = "binomial")
 }
 \arguments{
-\item{instance}{[\code{\link[salesperson]{Network}}]\cr
+\item{instance}{[\code{Network}]\cr
 Network instance.}
 
 \item{current.time}{[\code{numeric(1)}]\cr
@@ -25,7 +25,7 @@ Defaults to 1.}
 
 \item{template.ind}{[\code{integer}]\cr
 Tour used as a \dQuote{template} for a newly generated individual. Here,
-we aim to pass as much information from \code{template.tour} as possible.}
+we aim to pass as much information from \code{template.ind} as possible.}
 
 \item{init.distribution}{[\code{character(1)}]\cr
 How shall available dynamic customers be sampled?

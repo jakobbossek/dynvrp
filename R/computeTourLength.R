@@ -18,7 +18,6 @@ computeTourLength = function(ind, instance, vehicle = 1L) {
   idx.tour = which(ind$b == 1L & ind$v == vehicle)
   idx.tour = sort(which(ind$t %in% idx.tour))
   permutation = ind$t[idx.tour]
-  #permutation = ind$t[ind$b == 1L]
 
   # we need to reorder permutation if some parts are already visited
   if (length(ind$init.tours[[vehicle]]) > 0L) {

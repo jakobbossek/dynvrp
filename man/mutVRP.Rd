@@ -6,6 +6,16 @@
 \usage{
 mutVRP(ind, p.swap = 1)
 }
+\arguments{
+\item{ind}{[\code{VRPIndividual}]\cr
+Individual.}
+
+\item{p.swap}{[\code{numeric(1)}]\cr
+Swap probability. Defaults to 1.}
+}
+\value{
+[\code{VRPIndividual}]
+}
 \description{
 Performs two consecutive mutation steps:
 1) Mutate the binary string ind$b. I.e., dynamic, available, but not yet fixed customers

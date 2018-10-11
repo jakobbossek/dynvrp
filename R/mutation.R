@@ -4,6 +4,12 @@
 #' 1) Mutate the binary string ind$b. I.e., dynamic, available, but not yet fixed customers
 #' may be added or removed from customer list.
 #' 2) Swap mutation on ind$b, i.e., reorder the customer permutation.
+#'
+#' @param ind [\code{VRPIndividual}]\cr
+#'   Individual.
+#' @param p.swap [\code{numeric(1)}]\cr
+#'   Swap probability. Defaults to 1.
+#' @return [\code{VRPIndividual}]
 mutVRP = ecr::makeMutator(
   mutator = function(ind, p.swap = 1) {
     n = length(ind$b)

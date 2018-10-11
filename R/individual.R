@@ -1,6 +1,6 @@
 #' @title Initialize individual.
 #'
-#' @param instance [\code{\link[salesperson]{Network}}]\cr
+#' @param instance [\code{Network}]\cr
 #'   Network instance.
 #' @param current.time [\code{numeric(1)}]\cr
 #'   Current point in time.
@@ -13,7 +13,7 @@
 #'   Defaults to 1.
 #' @param template.ind [\code{integer}]\cr
 #'   Tour used as a \dQuote{template} for a newly generated individual. Here,
-#'   we aim to pass as much information from \code{template.tour} as possible.
+#'   we aim to pass as much information from \code{template.ind} as possible.
 #' @param init.distribution [\code{character(1)}]\cr
 #'   How shall available dynamic customers be sampled?
 #'   Option \dQuote{binomial}: each dynamic available customer is active with probability \eqn{0.5}
@@ -126,6 +126,11 @@ initIndividual = function(instance, current.time = 0, init.tours = integer(), n.
 }
 
 #' Simple printer for individuals.
+#'
+#' @param x [\code{VRPIndividual}]\cr
+#'   Individual.
+#' @param ... [any]\cr
+#'   Currently not used.
 #' @export
 print.VRPIndividual = function(x, ...) {
   catf("#Active customers:         %i", sum(x$b))
@@ -133,6 +138,11 @@ print.VRPIndividual = function(x, ...) {
 }
 
 #' Construct tour from individual.
+#'
+#' @param ind [\code{VRPIndividual}]\cr
+#'   Individual.
+#' @param ... [any]\cr
+#'   Currently not used.
 #' @export
 getToursFromIndividual = function(ind, append.depots = FALSE, ...) {
   # get active customers
@@ -165,4 +175,16 @@ getInitToursFromIndividual = function(ind, append.depot = FALSE, ...) {
     }
     return(it)
   })
+  tour = ind$t[idx.tour]
+
+  # we need to reorder permutation if some parts are already visited
+  if (length(ind$init.tour) > 0L) {
+    non.fixed = tour[!(tour %in% ind$init.tour)]
+    tour = c(ind$init.tour, non.fixed)
+  }
+
+  # +2 since we are 1-based in encoding and 1 and 2 are the depots
+  tour = tour + 2L
+
+  return(tour)
 }

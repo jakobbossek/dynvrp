@@ -1,3 +1,16 @@
+#' Given an individual and an instance, this function performs
+#' local search (focused on tour length minimization) accounting
+#' for partial tours which are already driven.
+#'
+#' @param ind [\code{VRPIndividual}]\cr
+#'   Individual.
+#' @param instance [\code{Network}]\cr
+#'   Netgen network.
+#' @param more.args [\code{list}]\cr
+#'   Further parameter passed down to local search procedure.
+#' @param ... [any]\cr
+#'   Not used at the moment.
+#' @return Modified individual.
 applyLocalSearch = function(ind, instance, more.args, ...) {
   for (v in seq_len(ind$n.vehicles)) {
     active.nodes = which(ind$b == 1L & ind$it != 1 & ind$v == v)
@@ -13,20 +26,6 @@ applyLocalSearch = function(ind, instance, more.args, ...) {
       instance,
       active.nodes = sort(active.nodes) + 2L,
       start.id = start.id, dest.id = 2L)
-
-    #idx.mandatory = which(instance$arrival.times == 0)
-    # if (n.init > 0) {
-    #   pl1 = autoplot(instance, path = c(1L, ind$init.tour))
-    #   pl1 = pl1 + geom_point(data = as.data.frame(instance$coordinates[idx.mandatory, , drop = FALSE]), colour = "tomato")
-    #   pl2 = autoplot(instance, path = c(ind$init.tour[n.init], ls.res, 2L))
-    #   pl2 = pl2 + geom_point(data = as.data.frame(instance$coordinates[idx.mandatory, , drop = FALSE]), colour = "tomato")
-    #   gridExtra::grid.arrange(pl1, pl2, nrow = 1L)
-    # } else {
-    #   pl1 = autoplot(instance, path = c(1L, ls.res, 2L))
-    #   pl1 = pl1 + geom_point(data = as.data.frame(instance$coordinates[idx.mandatory, , drop = FALSE]), colour = "tomato")
-    #   print(pl1)
-    # }
-    # BBmisc::pause()
 
     # nodes 1 and 2 are depots above. Hence, we need to recode to 1-based representation.
     ind$t[idx.tour] = ls.res - 2L

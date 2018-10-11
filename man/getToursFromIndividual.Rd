@@ -6,6 +6,13 @@
 \usage{
 getToursFromIndividual(ind, append.depots = FALSE, ...)
 }
+\arguments{
+\item{ind}{[\code{VRPIndividual}]\cr
+Individual.}
+
+\item{...}{[any]\cr
+Currently not used.}
+}
 \description{
 Construct tour from individual.
 }
