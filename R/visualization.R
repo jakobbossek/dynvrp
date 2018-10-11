@@ -1,17 +1,42 @@
+#' Visualize tours driven by vehicles by era.
+#'
+#' @param instance [\code{Network}]\cr
+#'   Network.
+#' @param time.resolution [\code{numeric(1)}]\cr
+#'   Time resolution used by \code{\link{dynamicVRPEMOA}}.
+#' @param tours [\code{list}]\cr
+#'   List of lists of integer vectors. Each top.level list represents an era
+#'   and the second-level lists contain the tours of the vehicles.
+#' @param init.tours [\code{list}]\cr
+#'   See documentation of \code{tours} for the structure. Contains for each
+#'   era to depict the tours already traveled by the vehicles until the
+#'   beginning of the corresponding era.
+#' @param customers.by.era [\code{logical(1)}]\cr
+#'   Colour customers by the era they arrived at?
+#'   Default is \code{TRUE}.
+#' @aram highlights.depots [\code{logical(1)}]\cr
+#'   Show start and end depot as large white circles with black border?
+#'   Default is \code{TRUE}.
+#' @param desature.nonvisited [\code{logical(1)}]\cr
+#'   This one is experimental.
+#'   Shall non-visited customers by depicted with reduced opacity?
+#'   Default is \code{FALSE}.
+#' @return [\code{\link[ggplot2]{ggplot}}]
+#' @export
 plotNetworkFancy = function(instance,
   time.resolution,
   tours = NULL,
   init.tours = NULL,
   customers.by.era = TRUE,
   highlight.depots = TRUE,
-  desaturate.nonvisited = TRUE) {
+  desaturate.nonvisited = FALSE) {
 
   checkmate::assertClass(instance, "Network")
   checkmate::checkNumber(time.resolution, lower = 1)
   checkmate::assertFlag(customers.by.era)
 
   df = as.data.frame(instance, include.extras = TRUE)
-  print(head(df))
+  #print(head(df))
 
   # if (!is.null(tours))
   #   checkmate::assertList(tours, types = "numeric")
@@ -37,7 +62,7 @@ plotNetworkFancy = function(instance,
 
   tour.grid = expand.grid(era = eras.to.show, vehicle = seq_len(n.vehicles))
 
-  print(tour.grid)
+  #print(tour.grid)
   df.tours = lapply(seq_len(nrow(tour.grid)), function(i) {
     era = tour.grid[i, 1L]
     vehicle = tour.grid[i, 2L]
@@ -80,8 +105,8 @@ plotNetworkFancy = function(instance,
   }))
 
 
-  print(head(df))
-  print(table(df$visited))
+  #print(head(df))
+  #print(table(df$visited))
 
   pl = ggplot(data = df, aes_string(x = "x1", y = "x2"))
   pl = pl + geom_path(data = df.tours)
@@ -134,7 +159,7 @@ plotEras = function(fronts, current.era, current.time, a.posteriori.approx = NUL
     current.era.df = fronts[[current.era]]
     catf("Selected element: %i", selected)
     current.era.df = current.era.df[selected, , drop = FALSE]
-    print(current.era.df)
+    #print(current.era.df)
     pl = pl + ggplot2::geom_point(data = current.era.df, size = 3, colour = "black") + ggplot2::geom_point(data = current.era.df, size = 2.8, colour = "white")
   }
 
