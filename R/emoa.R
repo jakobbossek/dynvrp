@@ -1,4 +1,9 @@
-#' @title Evolutionary Multi-Objective Algorithm for dynamic routing of a vehicle.
+#' @title Evolutionary Multi-Objective Algorithm for dynamic routing.
+#'
+#' @description EMOA designed to tackle a challenging multi-objective vehicle
+#' routing problem, where the goal is to minimize tour length(s) of one or
+#' multiple vehicles. Simultaneously, the number of unvisited customers which
+#' request for service as time passes by is to be minimized.
 #'
 #' @param fitness.fun [\code{function(ind, instance, ...)}]\cr
 #'   Fitness function depends on individuals (see docs for initIndividual),
@@ -264,7 +269,7 @@ dynamicVRPEMOA = function(fitness.fun,
     )
     #debug <<- population
 
-    population2 = getPopulations(log)
+    population2 = ecr::getPopulations(log)
     gg = length(population2)
     population2 = lapply(seq_len(gg), function(i) {
       ff = as.data.frame(t(population2[[i]]$fitness))

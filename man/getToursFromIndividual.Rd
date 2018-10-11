@@ -10,6 +10,10 @@ getToursFromIndividual(ind, append.depots = FALSE, ...)
 \item{ind}{[\code{VRPIndividual}]\cr
 Individual.}
 
+\item{append.depots}{[\code{logical(1)}]\cr
+Append depots?
+Defaults to \code{FALSE}.}
+
 \item{...}{[any]\cr
 Currently not used.}
 }

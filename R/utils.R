@@ -14,7 +14,7 @@ toVRPInstance = function(instance) {
   return(instance)
 }
 
-#' @title Find tour prefix of already visited customers.
+#' Find tour prefix of already visited customers.
 #'
 #' @param ind [\code{VRPIndividual}]\cr
 #'   Individual.

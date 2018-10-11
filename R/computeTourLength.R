@@ -1,10 +1,12 @@
-#' @title Helper for tour length computation.
+#' Helper for tour length computation.
 #'
 #' @param ind [\code{VRPIndividual}]\cr
 #'   Instance of type \code{VRPIndividual}.
 #' @param instance [\code{Network}\cr
 #'   Netgen network with slots \dQuote{coords} and \dQuote{dmat}, i.e., coordinates
 #'   and distance matrix with start and end depot!
+#' @param vehicle [\code{integer(1)}]\cr
+#'   ID of vehicle.
 #' @return [\code{numeric(1)}]
 #' @seealso fitness.fun
 computeTourLength = function(ind, instance, vehicle = 1L) {

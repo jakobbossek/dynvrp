@@ -2,7 +2,7 @@
 % Please edit documentation in R/individual.R
 \name{initIndividual}
 \alias{initIndividual}
-\title{Initialize individual.}
+\title{Individual initializer.}
 \usage{
 initIndividual(instance, current.time = 0, init.tours = integer(),
   n.vehicles = 1L, template.ind = NULL, init.distribution = "binomial")
@@ -48,4 +48,7 @@ we have \eqn{P(X = i) = \frac{1}{n_d}} for \eqn{i \in \{1, \ldots, n_d\}}. In a 
   \item{n.dynamic.inactive \code{integer(1)}}{Number of available, but not active dynamic customers i (i.e., b[i] = 0)}
   \item{init.tours \code{integer}}{Fixed tour part, i.e., sequence of nodes already visited.}
 }
+}
+\description{
+Individual initializer.
 }

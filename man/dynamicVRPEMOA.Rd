@@ -2,7 +2,7 @@
 % Please edit documentation in R/emoa.R
 \name{dynamicVRPEMOA}
 \alias{dynamicVRPEMOA}
-\title{Evolutionary Multi-Objective Algorithm for dynamic routing of a vehicle.}
+\title{Evolutionary Multi-Objective Algorithm for dynamic routing.}
 \usage{
 dynamicVRPEMOA(fitness.fun, instance, time.resolution = 100L,
   n.timeslots = NULL, n.vehicles = 1L,
@@ -120,4 +120,10 @@ Not used at the moment.}
     \item{\dQuote{dm.tour} [\code{character}]}{Comma-separated sequence of customers in tour selected by decision maker in the corresponding era.}
   }}
 }
+}
+\description{
+EMOA designed to tackle a challenging multi-objective vehicle
+routing problem, where the goal is to minimize tour length(s) of one or
+multiple vehicles. Simultaneously, the number of unvisited customers which
+request for service as time passes by is to be minimized.
 }

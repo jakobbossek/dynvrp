@@ -20,3 +20,6 @@ of all customers which already are served at a given point in time.}
 \value{
 [\code{integer}]
 }
+\description{
+Find tour prefix of already visited customers.
+}

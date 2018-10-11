@@ -1,4 +1,4 @@
-#' @title Initialize individual.
+#' Individual initializer.
 #'
 #' @param instance [\code{Network}]\cr
 #'   Network instance.
@@ -141,6 +141,9 @@ print.VRPIndividual = function(x, ...) {
 #'
 #' @param ind [\code{VRPIndividual}]\cr
 #'   Individual.
+#' @param append.depots [\code{logical(1)}]\cr
+#'   Append depots?
+#'   Defaults to \code{FALSE}.
 #' @param ... [any]\cr
 #'   Currently not used.
 #' @export
@@ -175,16 +178,4 @@ getInitToursFromIndividual = function(ind, append.depot = FALSE, ...) {
     }
     return(it)
   })
-  tour = ind$t[idx.tour]
-
-  # we need to reorder permutation if some parts are already visited
-  if (length(ind$init.tour) > 0L) {
-    non.fixed = tour[!(tour %in% ind$init.tour)]
-    tour = c(ind$init.tour, non.fixed)
-  }
-
-  # +2 since we are 1-based in encoding and 1 and 2 are the depots
-  tour = tour + 2L
-
-  return(tour)
 }

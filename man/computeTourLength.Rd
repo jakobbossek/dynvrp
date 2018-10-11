@@ -13,9 +13,15 @@ Instance of type \code{VRPIndividual}.}
 \item{instance}{[\code{Network}\cr
 Netgen network with slots \dQuote{coords} and \dQuote{dmat}, i.e., coordinates
 and distance matrix with start and end depot!}
+
+\item{vehicle}{[\code{integer(1)}]\cr
+ID of vehicle.}
 }
 \value{
 [\code{numeric(1)}]
+}
+\description{
+Helper for tour length computation.
 }
 \seealso{
 fitness.fun
