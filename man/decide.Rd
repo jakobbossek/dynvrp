@@ -14,13 +14,16 @@ decideInteractive(fitness, ...)
 decideRank(obj, q = 0.5, ...)
 }
 \arguments{
-\item{fitness}{[matrix]\cr
+\item{fitness}{[\code{matrix}]\cr
 Fitness matrix where each column represents one non-dominated solution.}
 
 \item{...}{[any]\cr
 Not used at the moment.}
 
-\item{q}{[\numeric(1)]\cr
+\item{obj}{[\code{integer(1)}]\cr
+Objective to use.}
+
+\item{q}{[\code{numeric(1)}]\cr
 Numeric values in \eqn{[0, 1]}. Used by \code{decideRank}.}
 }
 \value{

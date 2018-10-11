@@ -10,7 +10,7 @@ fitness.fun(ind, instance)
 \item{ind}{[\code{VRPIndividual}]\cr
 Encoding of individual.}
 
-\item{instance}{[\code{\link[salesperson]{Network}}]
+\item{instance}{[\code{Network}]
 Network instance.}
 }
 \value{

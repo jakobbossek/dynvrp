@@ -3,5 +3,6 @@
 #' @import checkmate
 #' @import parallelMap
 #' @import reshape2
-#' @import knitr
+#' @importFrom stats dist runif
+#' @importFrom utils head
 NULL

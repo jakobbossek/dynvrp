@@ -10,7 +10,7 @@ findFixedTour(ind, instance, time.bound)
 \item{ind}{[\code{VRPIndividual}]\cr
 Individual.}
 
-\item{instance}{[\code{\link[salesperson]{Network}}]\cr
+\item{instance}{[\code{Network}]\cr
 Network object.}
 
 \item{time.bound}{[\code{numeric(1)}]\cr

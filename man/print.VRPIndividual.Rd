@@ -6,6 +6,13 @@
 \usage{
 \method{print}{VRPIndividual}(x, ...)
 }
+\arguments{
+\item{x}{[\code{VRPIndividual}]\cr
+Individual.}
+
+\item{...}{[any]\cr
+Currently not used.}
+}
 \description{
 Simple printer for individuals.
 }

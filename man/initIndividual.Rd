@@ -8,7 +8,7 @@ initIndividual(instance, current.time = 0, init.tour = integer(),
   template.ind = NULL, init.distribution = "binomial")
 }
 \arguments{
-\item{instance}{[\code{\link[salesperson]{Network}}]\cr
+\item{instance}{[\code{Network}]\cr
 Network instance.}
 
 \item{current.time}{[\code{numeric(1)}]\cr
@@ -19,13 +19,21 @@ Default is 0.}
 Fixed prefix tour, i.e., part of tour which is already fixed,
 because time passed and vehicle already visited some customers.}
 
-\item{template.tour}{[\code{integer}]\cr
+\item{template.ind}{[\code{integer}]\cr
 Tour used as a \dQuote{template} for a newly generated individual. Here,
-we aim to pass as much information from \code{template.tour} as possible.}
+we aim to pass as much information from \code{template.ind} as possible.}
+
+\item{init.distribution}{[\code{character(1)}]\cr
+How shall available dynamic customers be sampled?
+Option \dQuote{binomial}: each dynamic available customer is active with probability \eqn{0.5}
+independently.
+Option \dQuote{uniform}: if there are \eqn{n_d} available dynamic customers,
+we have \eqn{P(X = i) = \frac{1}{n_d}} for \eqn{i \in \{1, \ldots, n_d\}}. In a second step
+\eqn{i} positions are sampled at random.}
 }
 \value{
 [\code{VRPIndividual}] List with following components:
-\describe{
+\itemize{
   \item[\code{b}]{Binary vector of length |V| - 2. b[i] is 1, if customer i is active, i.e., in tour.}
   \item[\code{t}]{Permutation vector.}
   \item[\code{p}]{Vector of mutation probablities. I.e., p[i] is the probability to flip b[i]. p[i] is zero if customer i is already fixed or not yet released.}

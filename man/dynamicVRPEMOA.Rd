@@ -14,14 +14,15 @@ dynamicVRPEMOA(fitness.fun, instance, time.resolution = 100L,
 \arguments{
 \item{fitness.fun}{[\code{function(ind, instance, ...)}]\cr
 Fitness function depends on individuals (see docs for initIndividual),
-the problem instnace of type \code{\link[salesperson]{Network}} and
+the problem instance of type \code{Network} and
 optional further parameter (not used at the moment).}
 
-\item{instance}{[\code{\link[salesperson]{Network}}]\cr
+\item{instance}{[\code{Network}]\cr
 Network object with exactly two depots and optional release dates.}
 
 \item{time.resolution}{[\code{numeric(1)}]\cr
-Width of time windows.}
+Width of time windows.
+Default is 100.}
 
 \item{n.timeslots}{[\code{integer(1)} | \code{NULL}]\cr
 Number of time steps.
@@ -53,6 +54,14 @@ local search at all.}
 \item{local.search.gens}{[\code{numeric}]\cr
 Generations where local search should be applied.}
 
+\item{init.distribution}{[\code{character(1)}]\cr
+How shall available dynamic customers be sampled?
+Option \dQuote{binomial}: each dynamic available customer is active with probability \eqn{0.5}
+independently.
+Option \dQuote{uniform}: if there are \eqn{n_d} available dynamic customers,
+we have \eqn{P(X = i) = \frac{1}{n_d}} for \eqn{i \in \{1, \ldots, n_d\}}. In a second step
+\eqn{i} positions are sampled at random.}
+
 \item{stop.conds}{[\code{list[ecr_terminator]}]\cr
 List of stopping conditions for each internal EMOA run.
 Default is to stop after 100 generations.}
@@ -60,6 +69,10 @@ Default is to stop after 100 generations.}
 \item{mu}{[\code{integer(1)}]\cr
 Population size.
 Defaults to 50.}
+
+\item{local.search.args}{[\code{list}]\cr
+List of arguments for local search algorithm.
+Defaults to empty list.}
 
 \item{lambda}{[\code{integer(1)}]\cr
 Number of offspring.
@@ -69,5 +82,38 @@ Default is \code{mu}.}
 Not used at the moment.}
 }
 \value{
-[list] List of \code{ecr_result} objects.
+[\code{list}] List with the following components:
+\describe{
+ \item{era.results}{Fine grained results. Use \code{str} to get insights.}
+ \item{pareto.front}{Data frame with columns
+  \describe{
+    \item{\dQuote{f1} [\code{numeric}]}{Tour length.}
+    \item{\dQuote{f2} [\code{integer}]}{Normalized number of unvisited customers.}
+    \item{\dQuote{f2shifted} [\code{integer}]}{Unnormalized number of unvisited customers.},
+    \item{\dQuote{era} [\code{integer}]}{Corresponding era.}
+    \item{\dQuote{selected} [\code{logical}]}{Indicates whether the solution was selected by the decision maker.}
+  }}
+\item{populations}{Data frame with objective vectors of all populations over all generations. Contains components
+  \describe{
+    \item{\dQuote{f1} [\code{numeric}]}{tour length}
+    \item{\dQuote{f2} [\code{integer}]}{(normalized tour length)}
+    \item{\dQuote{f2shifted} [\code{integer}]}{unnormalized number of unvisited customers.},
+    \item{\dQuote{era} [\code{integer}]}{Corresponding era.}
+    \item{\dQuote{gen} [\code{integer}]}{Generation.}
+  }}
+\item{meta}{Data frame with additional meta information per era, namely
+  \describe{
+    \item{\dQuote{era} [\code{integer}]}{Corresponding era.}
+    \item{\dQuote{current.time} [\code{numeric}]}{Time passed so far.}
+    \item{\dQuote{n.mandatory} [\code{integer}]}{Number of mandatory customers.}
+    \item{\dQuote{n.dynamic} [\code{integer}]}{Total number of dynamic customers.}
+    \item{\dQuote{n.dynamic.available} [\code{integer}]}{Number of available dynamic customers, i.e., those who already requested for service.}
+    \item{\dQuote{n.dynamic.upper.bound} [\code{integer}]}{Upper bound for the number of unserved dynamic customers (note, that a partial tour is already traveled.) in normalized space, i.e., the space used in the last era.}
+    \item{\dQuote{n.dynamic.lower.bound} [\code{integer}]}{Lower bound for the number of unserved dynamic customers (depends on the time and the number of already arrived dynamic requests.}
+    \item{\dQuote{n.dynamic.in.init.tour} [\code{integer}]}{Number of dynamic customers already visited.}
+    \item{\dQuote{time.passed} [\code{numeric}]}{Time passed during the start of the optimization process.}
+    \item{\dQuote{init.tour} [\code{character}]}{Comma-separated partial, already traveled tour.}
+    \item{\dQuote{dm.tour} [\code{character}]}{Comma-separated sequence of customers in tour selected by decision maker in the corresponding era.}
+  }}
+}
 }

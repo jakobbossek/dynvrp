@@ -9,7 +9,7 @@
 #'
 #' @param ind [\code{VRPIndividual}]\cr
 #'   Encoding of individual.
-#' @param instance [\code{\link[salesperson]{Network}}]
+#' @param instance [\code{Network}]
 #'   Network instance.
 #' @return [\code{numeric(2)}] Vector of tour length and number of
 #' unvisited dynamic customers.
