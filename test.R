@@ -38,17 +38,15 @@ st = proc.time()
 emoa.res2 = dynamicVRPEMOA(
   fitness.fun2, decision.fun = decideRank(1L, 0), instance = instance,
   mu = 5L, lambda = 5L,
-  n.vehicles = 3L,
+  n.vehicles = 5L,
   p.swap = 0.8,
   local.search.method = "eax",
   local.search.gens = c(10),
   init.keep = FALSE,
-  n.timeslots = 2L,
+  time.resolution = 350L,
   stop.conds = list(ecr::stopOnIters(10L))
 )
 time.passed = proc.time() - st
-
-fronts = emoa.res2$pareto.front
 
 # #stop("YAY!")
 # current.era = length(fronts)
@@ -56,15 +54,13 @@ fronts = emoa.res2$pareto.front
 # the.aposteriori = aposteriori[aposteriori$prob == gsub(" ", "", basename(inst)), , drop = FALSE]
 # pl.fronts = plotEras(fronts, current.era, length(fronts) * 100L, a.posteriori.approx = the.aposteriori)
 
-max.era = max(fronts$era)
+fronts = emoa.res2$pareto.front
+tours = getListOfToursByEras(emoa.res2, eras = c(1, max(fronts$era)))
 
-dm.ind = emoa.res2$era.results[[max.era]]$dm.choice.ind
-dm.ind.tours = getToursFromIndividual(dm.ind, append.depots = TRUE)
-dm.init.tours = getInitToursFromIndividual(dm.ind, append.depot = TRUE)
-names(dm.ind.tours) = paste0("vehicle", 1:dm.ind$n.vehicles)
-
-pl = plotNetworkFancy(instance, time.resolution = 250L,
-  tours = list("1" = dm.ind.tours, "3" = dm.ind.tours),
-  init.tours = list("1" = dm.init.tours, "3" = dm.init.tours))
+source("R/visualization.R")
+pl = plotNetworkFancy(instance, time.resolution = 350L,
+  tours = tours$dm.tours,
+  init.tours = tours$init.tours)
+print(pl)
 
 stop("Done :)")

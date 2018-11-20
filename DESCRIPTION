@@ -20,7 +20,8 @@ Imports:
     reshape2 (>= 1.4.1),
     ggplot2 (>= 1.0.0),
     viridis,
-    salesperson
+    salesperson,
+    TSP
 Suggests:
     testthat (>= 0.9.1)
 ByteCompile: yes

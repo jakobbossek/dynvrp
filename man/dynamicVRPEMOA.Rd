@@ -5,11 +5,11 @@
 \title{Evolutionary Multi-Objective Algorithm for dynamic routing.}
 \usage{
 dynamicVRPEMOA(fitness.fun, instance, time.resolution = 100L,
-  n.timeslots = NULL, n.vehicles = 1L,
-  decision.fun = dynvrp::decideRandom, do.pause = FALSE, p.swap = 1,
-  init.keep = TRUE, local.search.method = NULL, local.search.gens = 100L,
-  init.distribution = "binomial", stop.conds = list(ecr::stopOnIters(100L)),
-  mu = 50L, local.search.args = list(), lambda = mu, ...)
+  n.vehicles = 1L, decision.fun = dynvrp::decideRandom, do.pause = FALSE,
+  p.swap = 1, init.keep = TRUE, local.search.method = NULL,
+  local.search.gens = 100L, init.distribution = "binomial",
+  stop.conds = list(ecr::stopOnIters(100L)), mu = 50L,
+  local.search.args = list(), lambda = mu, ...)
 }
 \arguments{
 \item{fitness.fun}{[\code{function(ind, instance, ...)}]\cr
@@ -23,11 +23,6 @@ Network object with exactly two depots and optional release dates.}
 \item{time.resolution}{[\code{numeric(1)}]\cr
 Width of time windows.
 Default is 100.}
-
-\item{n.timeslots}{[\code{integer(1)} | \code{NULL}]\cr
-Number of time steps.
-If \code{NULL} (default), the value is computed via (max. request time
-of dynamic customers of \code{instance} / time.resolution.}
 
 \item{n.vehicles}{[\code{integer(1)}]\cr
 The number of vehicles.

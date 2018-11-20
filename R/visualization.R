@@ -14,10 +14,10 @@
 #' @param customers.by.era [\code{logical(1)}]\cr
 #'   Colour customers by the era they arrived at?
 #'   Default is \code{TRUE}.
-#' @aram highlights.depots [\code{logical(1)}]\cr
+#' @param highlight.depots [\code{logical(1)}]\cr
 #'   Show start and end depot as large white circles with black border?
 #'   Default is \code{TRUE}.
-#' @param desature.nonvisited [\code{logical(1)}]\cr
+#' @param desaturate.nonvisited [\code{logical(1)}]\cr
 #'   This one is experimental.
 #'   Shall non-visited customers by depicted with reduced opacity?
 #'   Default is \code{FALSE}.
@@ -87,10 +87,14 @@ plotNetworkFancy = function(instance,
 
   # categorize customers by era
   arrival.times = c(0, 0, instance$arrival.times)
+  BBmisc::messagef("Mandatory: %i", sum(arrival.times == 0))
+  print(c(-1, 0, seq_len(n.eras - 1L)) * time.resolution)
   df$era2 = cut(arrival.times,
-    breaks = (c(0, seq_len(n.eras - 1L))) * time.resolution,
-    labels = seq_len(n.eras - 1L),
-    right = FALSE)
+    breaks = (c(-1, 0, seq_len(n.eras - 1L))) * time.resolution,
+    labels = seq_len(n.eras),
+    right = TRUE)
+
+  print(df$era2)
 
   # if (!is.null(tours)) {
   #   visited = unique(unlist(tours))

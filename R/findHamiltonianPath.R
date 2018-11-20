@@ -71,7 +71,7 @@ findHamiltonianPath = function(
   dmat2 = floor(dmat2)
   n = nrow(dmat2)
   dummy.coords = matrix(runif(2 * n), ncol = 2)
-  instance2 = netgen::makeNetwork(coordinates = dummy.coords, distance.matrix = dmat2, name = "dummy")
+  instance2 = salesperson::makeNetwork(coordinates = dummy.coords, distance.matrix = dmat2, name = "dummy")
 
   # actually run solver
   res = salesperson::runSolver("eax", instance = instance2, solver.pars = list(full.matrix = TRUE, cutoff.time = 1L))
@@ -105,7 +105,7 @@ findHamiltonianPath = function(
   # print(h.path1.length)
   # print(h.path2.length)
 
-  instance3 = netgen::makeNetwork(coordinates = coords, name = "dummy2")
+  instance3 = salesperson::makeNetwork(coordinates = coords, name = "dummy2")
 
   # an = if (h.path1.length < h.path2.length) {
   #   active.nodes[rev(cut.tour)]

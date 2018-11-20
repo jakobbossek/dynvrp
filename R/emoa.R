@@ -14,10 +14,6 @@
 #' @param time.resolution [\code{numeric(1)}]\cr
 #'   Width of time windows.
 #'   Default is 100.
-#' @param n.timeslots [\code{integer(1)} | \code{NULL}]\cr
-#'   Number of time steps.
-#'   If \code{NULL} (default), the value is computed via (max. request time
-#'   of dynamic customers of \code{instance} / time.resolution.
 #' @param n.vehicles [\code{integer(1)}]\cr
 #'   The number of vehicles.
 #'   Default is 1.
@@ -99,7 +95,6 @@
 dynamicVRPEMOA = function(fitness.fun,
   instance,
   time.resolution = 100L,
-  n.timeslots = NULL,
   n.vehicles = 1L,
   decision.fun = dynvrp::decideRandom,
   do.pause = FALSE,
@@ -134,9 +129,8 @@ dynamicVRPEMOA = function(fitness.fun,
   n.dynamic = sum(instance$arrival.times > 0)
   n.mandatory = sum(instance$arrival.times == 0)
 
-  if (is.null(n.timeslots))
-    n.timeslots = ceiling(max.time / time.resolution) + 1L
-  n.timeslots = asInt(n.timeslots, lower = 1L)
+  n.timeslots = ceiling(max.time / time.resolution) + 1L
+  BBmisc::messagef("[dynamicVRPEMOA] Running for %i eras.", n.timeslots)
   current.time = 0
 
   # init control object
