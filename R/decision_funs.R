@@ -39,22 +39,16 @@ decideInteractive = function(fitness, ...) {
 
 #' @rdname decide
 #' @export
-decideRank = function(obj, q = 0.5, ...) {
+decideRank = function(fitness, obj = 1, q = 0.5, ...) {
   assertNumber(obj, lower = 1, upper = 2)
   assertNumber(q, lower = 0, upper = 1)
 
-  force(obj)
-  force(q)
-
-  decide = function(fitness, ...) {
-    n = ncol(fitness)
-    vals = fitness[obj, ]
-    rk = floor(q * n)
-    if (rk == 0)
-      rk = 1L
-    ord = order(vals)
-    dm.choice = ord[rk]
-    return(dm.choice)
-  }
-  return(decide)
+  n = ncol(fitness)
+  vals = fitness[obj, ]
+  rk = floor(q * n)
+  if (rk == 0)
+    rk = 1L
+  ord = order(vals)
+  dm.choice = ord[rk]
+  return(dm.choice)
 }

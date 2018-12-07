@@ -22,6 +22,11 @@
 #'   May be used for interactive decision or decision maker simulation (e.g.,
 #'   always decide for lexicographic optimum regarding one of the objective functions).
 #'   Default is \code{decideRandom}, i.e., random choice of solution.
+#'   If a vector of functions is passed the i-th function is used to make a choice
+#'   in the i-th era.
+#' @param decision.params [\code{list | NULL}]\cr
+#'   List of named lists of parameter choices for \code{decision.fun}.
+#'   The i-the list is passed down to the i-th decision.fun in the i-th era.
 #' @param do.pause [\code{logical(1)}]\cr
 #'   Pause execution after each time slot?
 #'   Default is \code{FALSE}.
@@ -55,6 +60,9 @@
 #' @param lambda [\code{integer(1)}]\cr
 #'   Number of offspring.
 #'   Default is \code{mu}.
+#' @param seed [\code{integer} | \code{NULL}]\cr
+#'   Optional seed for run.
+#'   Set outside the algorithm by default.
 #' @param ... [any]\cr
 #'   Not used at the moment.
 #' @return [\code{list}] List with the following components:
@@ -95,8 +103,10 @@
 dynamicVRPEMOA = function(fitness.fun,
   instance,
   time.resolution = 100L,
+  n.timeslots = NULL,
   n.vehicles = 1L,
   decision.fun = dynvrp::decideRandom,
+  decision.params = list(),
   do.pause = FALSE,
   p.swap = 1,
   init.keep = TRUE,
@@ -107,11 +117,13 @@ dynamicVRPEMOA = function(fitness.fun,
   mu = 50L,
   local.search.args = list(),
   lambda = mu,
+  seed = NULL,
   ...) {
 
+  if (!is.null(seed))
+    set.seed(seed)
+
   assertFunction(fitness.fun)
-  assertFunction(decision.fun)
-  assertNumber(time.resolution)
   assertList(stop.conds)
   assertNumber(p.swap, lower = 0,, upper = 1)
   assertChoice(local.search.method, choices = c("eax", "lkh"), null.ok = TRUE)
@@ -119,6 +131,9 @@ dynamicVRPEMOA = function(fitness.fun,
 
   if (init.keep & n.vehicles > 1L)
     BBmisc::stopf("[dynamicVRPEMOA] Currently init.keep is not supported if >1 vehicles are available.")
+
+  if (!is.null(n.timeslots) & !is.null(time.resolution))
+    BBmisc::stopf("[dynamicVRPEMOA] Both n.timeslots and time.resolution passed.")
 
   n.vehicles = asInt(n.vehicles, lower = 1L)
   mu = asInt(mu, lower = 5L)
@@ -129,8 +144,27 @@ dynamicVRPEMOA = function(fitness.fun,
   n.dynamic = sum(instance$arrival.times > 0)
   n.mandatory = sum(instance$arrival.times == 0)
 
-  n.timeslots = ceiling(max.time / time.resolution) + 1L
-  BBmisc::messagef("[dynamicVRPEMOA] Running for %i eras.", n.timeslots)
+  if (!is.null(time.resolution)) {
+    n.timeslots = ceiling(max.time / time.resolution) + 1L
+  } else {
+    time.resolution = ceiling(max.time / (time.resolution - 2))
+  }
+
+  BBmisc::messagef("[dynamicVRPEMOA] Running for %i eras with time resolution: %.3f.", n.timeslots, time.resolution)
+
+  assertNumber(time.resolution)
+
+  if (is.list(decision.fun)) {
+    if (length(decision.fun) != n.timeslots) {
+      BBmisc::messagef("[dynamicVRPEMOA] Running for %i timeslots, but only %i decision functions passed.", n.timeslots, length(decision.fun))
+    }
+    #checkmate::assertList(decision.fun, types = "function")
+
+    if (!is.list(decision.params)) {
+      BBmisc::messagef("[dynamicVRPEMOA] decision.params need to be a list of length n.timeslots.", n.timeslots)
+    }
+  }
+
   current.time = 0
 
   # init control object
@@ -226,8 +260,19 @@ dynamicVRPEMOA = function(fitness.fun,
     # update time
     current.time = current.time + time.resolution
 
+    # select decision fun
+    dm.fun = decision.fun
+    dm.params = decision.params
+    if (is.list(decision.fun)) {
+      dm.fun = decision.fun[[era]]
+      dm.params = decision.params[[era]]
+    }
+
+    print(dm.params)
+
     # decision maker (get index of selected solution)
-    dm.choice = decision.fun(nondom.fitness)
+    dm.params$fitness = nondom.fitness
+    dm.choice = do.call(dm.fun, args = dm.params)
 
     # get solution and fix initial tour
     dm.ind = nondom.population[[dm.choice]]
@@ -241,9 +286,9 @@ dynamicVRPEMOA = function(fitness.fun,
     front.approx$selected[dm.choice] = TRUE
     era.results[[era]]$front = front.approx
 
-    print(init.tours)
+    #print(init.tours)
 
-    print(getToursFromIndividual(dm.ind, append.depots = TRUE))
+    #print(getToursFromIndividual(dm.ind, append.depots = TRUE))
 
     era.results[[era]]$meta = data.frame(
       era = era,
