@@ -36,9 +36,12 @@ instance.apost = aposteriori
 
 st = proc.time()
 emoa.res2 = dynamicVRPEMOA(
-  fitness.fun2, decision.fun = decideRank(1L, 0), instance = instance,
+  fitness.fun2,
+  decision.fun = list(decideRank, decideRank, decideRank),
+  decision.params = list(list(q = 0.1), list(q = 0.5), list(q = 0.8)),
+  instance = instance,
   mu = 5L, lambda = 5L,
-  n.vehicles = 5L,
+  n.vehicles = 1L,
   p.swap = 0.8,
   local.search.method = "eax",
   local.search.gens = c(10),
