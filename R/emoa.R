@@ -300,11 +300,10 @@ dynamicVRPEMOA = function(fitness.fun,
       n.dynamic.lower.bound = n.dynamic - n.dynamic.available,
       n.dynamic.in.init.tour = n.dynamic.in.init.tour,
       time.passed = log$env$time.passed,
-      #init.tours = init.tours,
-      #dm.tour = getToursFromIndividual(dm.ind, append.depots = TRUE)
-      # need to add 1
-      init.tour = NA,# BBmisc::collapse(c(1, init.tour + 2L)),
-      dm.tour = NA# BBmisc::collapse(getToursFromIndividual(dm.ind, append.depots == TRUE))
+      #FIXME: this works only for 1 vehicle
+      init.tour = BBmisc::collapse(c(1, getInitToursFromIndividual(dm.ind, append.depots = FALSE)[[1L]])),
+      dm.tour = BBmisc::collapse(getToursFromIndividual(dm.ind, append.depots = TRUE)[[1L]]),
+      stringsAsFactors = FALSE
     )
     #debug <<- population
 
