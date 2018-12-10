@@ -74,7 +74,24 @@ findHamiltonianPath = function(
   instance2 = salesperson::makeNetwork(coordinates = dummy.coords, distance.matrix = dmat2, name = "dummy")
 
   # actually run solver
-  res = salesperson::runSolver("eax", instance = instance2, solver.pars = list(full.matrix = TRUE, cutoff.time = 1L))
+  max.tries = 5L
+  n.tries = 1L
+  res = NULL
+  repeat {
+    # sometimes the application of local search fails
+    # we repeat here until a run succeeds or a maximal number of
+    # tries failed
+    res = try({
+      salesperson::runSolver("eax", instance = instance2, solver.pars = list(full.matrix = TRUE, cutoff.time = 1L))
+    }, silent = TRUE)
+    if (!inherits("try-error", res)) {
+      break
+    }
+    if (n.tries >= max.tries) {
+      BBmisc::stopf("[dynamicVRPEMOA] Local search failed %i times.", n.tries)
+    }
+    n.tries = n.tries + 1L
+  }
   #print(str(res))
   #instance2$distance.matrix = dmat3
   #print(salesperson::computeTourLength(instance2, res$tour, close.tour = TRUE))
