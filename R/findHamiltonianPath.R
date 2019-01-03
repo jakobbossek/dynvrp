@@ -84,7 +84,7 @@ findHamiltonianPath = function(
     res = try({
       salesperson::runSolver("eax", instance = instance2, solver.pars = list(full.matrix = TRUE, cutoff.time = 1L))
     }, silent = TRUE)
-    if (!inherits("try-error", res)) {
+    if (!inherits(res, "try-error")) {
       break
     }
     if (n.tries >= max.tries) {
