@@ -147,7 +147,7 @@ dynamicVRPEMOA = function(fitness.fun,
   if (!is.null(time.resolution)) {
     n.timeslots = ceiling(max.time / time.resolution) + 1L
   } else {
-    time.resolution = ceiling(max.time / (time.resolution - 2))
+    time.resolution = ceiling(max.time / (n.timeslots - 2))
   }
 
   BBmisc::messagef("[dynamicVRPEMOA] Running for %i eras with time resolution: %.3f.", n.timeslots, time.resolution)
