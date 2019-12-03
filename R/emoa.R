@@ -129,8 +129,8 @@ dynamicVRPEMOA = function(fitness.fun,
   assertChoice(local.search.method, choices = c("eax", "lkh"), null.ok = TRUE)
   assertChoice(init.distribution, choices = c("binomial", "uniform"), null.ok = FALSE)
 
-  if (init.keep & n.vehicles > 1L)
-    BBmisc::stopf("[dynamicVRPEMOA] Currently init.keep is not supported if >1 vehicles are available.")
+  # if (init.keep & n.vehicles > 1L)
+  #   BBmisc::stopf("[dynamicVRPEMOA] Currently init.keep is not supported if >1 vehicles are available.")
 
   if (!is.null(n.timeslots) & !is.null(time.resolution))
     BBmisc::stopf("[dynamicVRPEMOA] Both n.timeslots and time.resolution passed.")
@@ -292,6 +292,8 @@ dynamicVRPEMOA = function(fitness.fun,
 
     era.results[[era]]$meta = data.frame(
       era = era,
+      time.resolution = time.resolution,
+      n.vehicles = n.vehicles,
       current.time = current.time,
       n.mandatory = n.mandatory,
       n.dynamic = n.dynamic,

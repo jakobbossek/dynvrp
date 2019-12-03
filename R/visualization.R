@@ -29,7 +29,9 @@ plotNetworkFancy = function(instance,
   init.tours = NULL,
   customers.by.era = TRUE,
   highlight.depots = TRUE,
-  desaturate.nonvisited = FALSE) {
+  desaturate.nonvisited = FALSE,
+  filter.eras = NULL,
+  facet.type = "grid", facet.args = list()) {
 
   checkmate::assertClass(instance, "Network")
   checkmate::checkNumber(time.resolution, lower = 1)
@@ -73,6 +75,7 @@ plotNetworkFancy = function(instance,
     return(tour.coords)
   })
   df.tours = do.call(rbind, df.tours)
+  #print(df.tours)
 
   df.init.tours = lapply(seq_len(nrow(tour.grid)), function(i) {
     era = tour.grid[i, 1L]
@@ -84,6 +87,7 @@ plotNetworkFancy = function(instance,
     return(tour.coords)
   })
   df.init.tours = do.call(rbind, df.init.tours)
+  #print(df.init.tours)
 
   # categorize customers by era
   arrival.times = c(0, 0, instance$arrival.times)
@@ -94,7 +98,7 @@ plotNetworkFancy = function(instance,
     labels = seq_len(n.eras),
     right = TRUE)
 
-  print(df$era2)
+  #print(df$era2)
 
   # if (!is.null(tours)) {
   #   visited = unique(unlist(tours))
@@ -107,7 +111,13 @@ plotNetworkFancy = function(instance,
     tmp$era = era
     return(tmp)
   }))
+  #print(df)
 
+  if (!is.null(filter.eras)) {
+    df = df[df$era %in% filter.eras, , drop = FALSE]
+    df.init.tours = df.init.tours[df.init.tours$era %in% filter.eras, , drop = FALSE]
+    df.tours = df.tours[df.tours$era %in% filter.eras, , drop = FALSE]
+  }
 
   #print(head(df))
   #print(table(df$visited))
@@ -133,7 +143,14 @@ plotNetworkFancy = function(instance,
     pl = pl + geom_point(data = df.depots, aes_string(colour = NULL), colour = "white", size = 2.2)
   }
 
-  pl = pl + facet_grid(. ~ era + vehicle, labeller = label_both)
+  # facet.fun = if (facet.type == "grid") ggplot2::facet_grid else ggplot2::facet_wrap
+  # facet.args = BBmisc::insert(list(facets = . ~ era + vehicle, labeller = label_both), facet.args)
+  #pl = pl + do.call(facet.fun, facet.args)
+  if (n.vehicles == 1L)
+    pl = pl + facet_grid(. ~ era, labeller = label_both)#, ncol = 4)
+  else
+    pl = pl + facet_grid(era ~ vehicle, labeller = label_both)#, ncol = 4)
+    #pl = pl + facet_grid(. ~ era + vehicle, labeller = label_both)#, ncol = 4)
 
   pl = pl + labs(
     colour = "Era",

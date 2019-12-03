@@ -106,6 +106,9 @@ initIndividual = function(instance, current.time = 0, init.tours = integer(), n.
     idx.template.active = which(template.ind$b == 1L)
     ind$b[idx.template.active] = 1L
 
+    # assure vehicle assignment to active nodes did not change
+    ind$v[idx.template.active] = template.ind$v[idx.template.active]
+
     # assure that active nodes are in the order they occured in template
     active.nodes = which(template.ind$b == 1 & ind$it != 1)
     idx.tour = which(ind$t %in% active.nodes)

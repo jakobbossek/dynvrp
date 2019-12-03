@@ -1,6 +1,6 @@
 #set.seed(1)
 
-SOLVER.PATH = c("eax" = file.path("/Users/jboss/repositories/paper/tsp_publications/TSPAS/solvers/EAX/main"))
+SOLVER.PATH = c("eax" = file.path("/Users/bossek/.config/salesperson/solvers/EAX/main"))
 salesperson::solverPaths(as.list(SOLVER.PATH))
 
 getTestInstance = function() {
