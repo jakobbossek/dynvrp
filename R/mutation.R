@@ -21,14 +21,10 @@ mutVRP = ecr::makeMutator(
     }
 
     # now "swap" vehicles
-    idx.active.tour = which(ind$b == 1L & ind$it != 1L)
-    #print(idx.active.tour)
-    n.idx.active.tour = length(idx.active.tour)
-    #print(n.idx.active.tour)
     if (ind$n.vehicles > 1L) {
-      do.change.car = which(runif(n.idx.active.tour) < ind$p[idx.active.tour])
+      do.change.car = which(runif(n) < ind$p)
       if (length(do.change.car) > 0L) {
-        ind$v[idx.active.tour[do.change.car]] = sample(seq_len(ind$n.vehicles), size = length(do.change.car), replace = TRUE)
+        ind$v[do.change.car] = sample(seq_len(ind$n.vehicles), size = length(do.change.car), replace = TRUE)
       }
     }
 

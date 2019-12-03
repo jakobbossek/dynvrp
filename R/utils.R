@@ -38,11 +38,16 @@ findFixedTour = function(ind, instance, time.bound) {
     idx.tour = sort(which(ind$t %in% idx.tour))
     permutation = ind$t[idx.tour]
 
-    # we need to reorder permutation if some parts are already visited
+    # BBmisc::catf("BEFORE")
+    # print(permutation)
+    # # we need to reorder permutation if some parts are already visited
     if (length(ind$init.tours[[v]]) > 0L) {
       non.fixed = permutation[!(permutation %in% ind$init.tours[[v]])]
       permutation = c(ind$init.tours[[v]], non.fixed)
     }
+    # BBmisc::catf("AFTER")
+    # print(permutation)
+
 
     # shift customer IDs/positions (depots are encoded as customoers 1 and 2 in instance)
     permutation = permutation + 2L
