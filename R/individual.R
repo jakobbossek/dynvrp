@@ -48,7 +48,7 @@ initIndividual = function(instance, current.time = 0, init.tours = integer(), n.
 
   # which customers (both mandatory and available dynamic) are not yet visited
   yet.visited = unlist(init.tours)
-  print(init.tours)
+  #print(init.tours)
   not.yet.visited = setdiff(1:n, yet.visited)
 
   # init individual
@@ -102,6 +102,7 @@ initIndividual = function(instance, current.time = 0, init.tours = integer(), n.
 
   #FIXME: use only nondominated solutions?
   # now adapt tour if template is passed
+
   if (!is.null(template.ind)) {
     # carry over all active nodes of template
     idx.template.active = which(template.ind$b == 1L)
@@ -123,7 +124,17 @@ initIndividual = function(instance, current.time = 0, init.tours = integer(), n.
   stopifnot(sum(ind$b) <= n.mandatory + n.dynamic.available)
   stopifnot(sum(ind$b) >= n.mandatory)
   stopifnot(all(ind$v >= 1 & ind$v <= n.vehicles))
-  stopifnot(sum(ind$it) == (length(yet.visited) - n.vehicles + 1L))
+
+  # BBmisc::catf("Active in ind: %i", sum(ind$it))
+  # BBmisc::catf("Yet visited:   %i", length(yet.visited))
+
+  # if (!(sum(ind$it) == length(yet.visited))) {
+  #   print(ind)
+  #   print(yet.visited)
+  #   print(init.tours)
+  # }
+
+  stopifnot(sum(ind$it) == length(yet.visited))
 
   class(ind) = "VRPIndividual"
   return(ind)
