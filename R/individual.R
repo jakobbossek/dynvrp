@@ -199,3 +199,17 @@ getInitToursFromIndividual = function(ind, append.depot = FALSE, ...) {
     return(it)
   })
 }
+
+toursToString = function(tours) {
+  tours = lapply(tours, function(tour) {
+    BBmisc::collapse(tour, sep = ",")
+  })
+  BBmisc::collapse(tours, sep = ";")
+}
+
+stringToTours = function(s) {
+  tours = strsplit(s, split = ";", fixed = TRUE)[[1L]]
+  lapply(tours, function(tour) {
+    as.integer(strsplit(tour, split = ",", fixed = TRUE)[[1L]])
+  })
+}

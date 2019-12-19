@@ -63,6 +63,9 @@
 #' @param seed [\code{integer} | \code{NULL}]\cr
 #'   Optional seed for run.
 #'   Set outside the algorithm by default.
+#' @param aposteriori [\code{logical(1)}]\cr
+#'   Treat the problem from an a posteriori perspective, i.e., perform just a single run of the EMOA,
+#'   but give him oracle knowledge on the request times of dynamic requests.
 #' @param ... [any]\cr
 #'   Not used at the moment.
 #' @return [\code{list}] List with the following components:
@@ -112,12 +115,13 @@ dynamicVRPEMOA = function(fitness.fun,
   init.keep = TRUE,
   local.search.method = NULL,
   local.search.gens = 100L,
-  init.distribution = "binomial",
+  init.distribution = "uniform",
   stop.conds = list(ecr::stopOnIters(100L)),
   mu = 50L,
   local.search.args = list(),
   lambda = mu,
   seed = NULL,
+  aposteriori = FALSE,
   ...) {
 
   if (!is.null(seed))
@@ -128,6 +132,7 @@ dynamicVRPEMOA = function(fitness.fun,
   assertNumber(p.swap, lower = 0,, upper = 1)
   assertChoice(local.search.method, choices = c("eax", "lkh"), null.ok = TRUE)
   assertChoice(init.distribution, choices = c("binomial", "uniform"), null.ok = FALSE)
+  assertFlag(aposteriori)
 
   # if (init.keep & n.vehicles > 1L)
   #   BBmisc::stopf("[dynamicVRPEMOA] Currently init.keep is not supported if >1 vehicles are available.")
@@ -173,16 +178,23 @@ dynamicVRPEMOA = function(fitness.fun,
   control = ecr::registerECROperator(control, slot = "selectForMating", ecr::selSimple)
   control = ecr::registerECROperator(control, slot = "selectForSurvival", ecr::selNondom)
 
+  # initial tours empty at the beginning
   init.tours = lapply(seq_len(n.vehicles), function(i) integer())
+
+  # allocate vector for individual results per era
   era.results = vector(mode = "list", length = n.timeslots)
   stop.object = NA
 
+  # ERA/EPOCH loop
   for (era in seq_len(n.timeslots)) {
     catf("Starting era %i. Current time: %.2f", era, current.time)
 
     # init EMOA
     population = if (!init.keep | current.time == 0) {
-      ecr::gen(initIndividual(instance, init.tours = init.tours, current.time = current.time, init.distribution = init.distribution, n.vehicles = n.vehicles), mu)
+      # in a posteriori approach we pass a dummy time larger than the latest request time. This way
+      # all dyanmic customers are available to the algorithm.
+      current.time2 = if (aposteriori) max.time + 1 else current.time
+      ecr::gen(initIndividual(instance, init.tours = init.tours, current.time = current.time2, init.distribution = init.distribution, n.vehicles = n.vehicles), mu)
     } else {
       lapply(population, function(template.ind) {
         initIndividual(instance, init.tours = init.tours, current.time = current.time, init.distribution = init.distribution, n.vehicles = n.vehicles, template.ind = template.ind)
@@ -195,6 +207,7 @@ dynamicVRPEMOA = function(fitness.fun,
     ecr::updateLogger(log, population, fitness = fitness, n.evals = mu)
 
     gen = 0L
+
     # EMOA loop
     while (TRUE) {
 
@@ -222,7 +235,7 @@ dynamicVRPEMOA = function(fitness.fun,
         catf("Finished EMOA run: %s", stop.object$message)
         break
       }
-    }
+    } # END OF EMOA LOOP
 
     # final LS polishing
     if (!is.null(local.search.method)) {
@@ -257,6 +270,14 @@ dynamicVRPEMOA = function(fitness.fun,
     era.results[[era]]$init.tours = lapply(init.tours, function(it) c(1, it + 2L))
     era.results[[era]]$result = ecr:::makeECRResult(control, log, population, fitness, stop.object)
 
+    # quit here after "first and single era" if a posteriori approach is used
+    if (aposteriori) {
+      # correction
+      front.approx$f2shifted = front.approx$f2
+      front.approx$f2shifted = front.approx$era = NULL
+      return(front.approx)
+    }
+
     # update time
     current.time = current.time + time.resolution
 
@@ -267,8 +288,6 @@ dynamicVRPEMOA = function(fitness.fun,
       dm.fun = decision.fun[[era]]
       dm.params = decision.params[[era]]
     }
-
-    print(dm.params)
 
     # decision maker (get index of selected solution)
     dm.params$fitness = nondom.fitness
@@ -302,24 +321,24 @@ dynamicVRPEMOA = function(fitness.fun,
       n.dynamic.lower.bound = n.dynamic - n.dynamic.available,
       n.dynamic.in.init.tour = n.dynamic.in.init.tour,
       time.passed = log$env$time.passed,
-      #FIXME: this works only for 1 vehicle
-      init.tour = BBmisc::collapse(c(1, getInitToursFromIndividual(dm.ind, append.depots = FALSE)[[1L]])),
-      dm.tour = BBmisc::collapse(getToursFromIndividual(dm.ind, append.depots = TRUE)[[1L]]),
+      init.tour = toursToString(getInitToursFromIndividual(dm.ind, append.depot = TRUE)),
+      # init.tour = BBmisc::collapse(c(1, getInitToursFromIndividual(dm.ind, append.depots = FALSE)[[1L]])),
+      dm.tour = toursToString(getToursFromIndividual(dm.ind, append.depots = TRUE)),
       stringsAsFactors = FALSE
     )
     #debug <<- population
 
-    population2 = ecr::getPopulations(log)
-    gg = length(population2)
-    population2 = lapply(seq_len(gg), function(i) {
-      ff = as.data.frame(t(population2[[i]]$fitness))
-      colnames(ff) = c("f1", "f2")
-      ff$f2shifted = n.dynamic - (n.dynamic.available - ff$f2)
-      ff$era = era
-      ff$gen = i
-      return(ff)
-    })
-    era.results[[era]]$population = do.call(rbind, population2)
+    # population2 = ecr::getPopulations(log)
+    # gg = length(population2)
+    # population2 = lapply(seq_len(gg), function(i) {
+    #   ff = as.data.frame(t(population2[[i]]$fitness))
+    #   colnames(ff) = c("f1", "f2")
+    #   ff$f2shifted = n.dynamic - (n.dynamic.available - ff$f2)
+    #   ff$era = era
+    #   ff$gen = i
+    #   return(ff)
+    # })
+    # era.results[[era]]$population = do.call(rbind, population2)
 
     catf("DM choice is: %i", dm.choice)
     #catf("Decided for tour: %s", BBmisc::collapse(init.tour, sep = ", "))
@@ -332,12 +351,13 @@ dynamicVRPEMOA = function(fitness.fun,
 
   pareto.front = do.call(rbind, lapply(era.results, function(er) er$front))
   meta = do.call(rbind, lapply(era.results, function(er) er$meta))
-  populations = do.call(rbind, lapply(era.results, function(er) er$population))
+  #populations = do.call(rbind, lapply(era.results, function(er) er$population))
 
   return(list(
     era.results = era.results,
     pareto.front = pareto.front,
-    meta = meta,
-    populations = populations
+    meta = meta
+    #populations = populations
   ))
 }
+

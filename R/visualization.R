@@ -53,41 +53,39 @@ plotNetworkFancy = function(instance,
 
   # determine number of eras
   max.arrival.time = max(instance$arrival.times)
-  n.eras = ceiling(max.arrival.time / time.resolution) + 1L
+  n.eras = length(tours)
   n.vehicles = length(tours[[1L]])
 
-  eras.to.show = as.integer(names(tours))
+  # if (any(eras.to.show > n.eras))
+  #   BBmisc::stopf("[plotNetworkFancy] There are %i eras with time resolution %i, but
+  #     eras to show are %s", n.eras, time.resolution, BBmisc::collapse(eras.to.show, sep = ", "))
 
-  if (any(eras.to.show > n.eras))
-    BBmisc::stopf("[plotNetworkFancy] There are %i eras with time resolution %i, but
-      eras to show are %s", n.eras, time.resolution, BBmisc::collapse(eras.to.show, sep = ", "))
+  tour.grid = expand.grid(era = seq_len(n.eras), vehicle = seq_len(n.vehicles))
 
-  tour.grid = expand.grid(era = eras.to.show, vehicle = seq_len(n.vehicles))
-
-  #print(tour.grid)
   df.tours = lapply(seq_len(nrow(tour.grid)), function(i) {
     era = tour.grid[i, 1L]
     vehicle = tour.grid[i, 2L]
-    tour = tours[[as.character(era)]][[vehicle]]
+    tour = tours[[era]][[vehicle]]
     tour.coords = df[tour, , drop = FALSE]
     tour.coords$era = era
     tour.coords$vehicle = vehicle
     return(tour.coords)
   })
   df.tours = do.call(rbind, df.tours)
+
   #print(df.tours)
 
   df.init.tours = lapply(seq_len(nrow(tour.grid)), function(i) {
     era = tour.grid[i, 1L]
     vehicle = tour.grid[i, 2L]
-    tour = init.tours[[as.character(era)]][[vehicle]]
+    tour = init.tours[[era]][[vehicle]]
     tour.coords = df[tour, , drop = FALSE]
     tour.coords$era = era
     tour.coords$vehicle = vehicle
+    print(tour.coords)
     return(tour.coords)
   })
   df.init.tours = do.call(rbind, df.init.tours)
-  #print(df.init.tours)
 
   # categorize customers by era
   arrival.times = c(0, 0, instance$arrival.times)
@@ -106,7 +104,7 @@ plotNetworkFancy = function(instance,
   #   df[!visited, "visited"] = 0.5
   # }
 
-  df = do.call(rbind, lapply(eras.to.show, function(era) {
+  df = do.call(rbind, lapply(seq_len(n.eras), function(era) {
     tmp = df[as.integer(df$era2) <= era, , drop = FALSE]
     tmp$era = era
     return(tmp)
@@ -114,7 +112,7 @@ plotNetworkFancy = function(instance,
   #print(df)
 
   if (!is.null(filter.eras)) {
-    df = df[df$era %in% filter.eras, , drop = FALSE]
+    df = df[as.integer(df$era) %in% filter.eras, , drop = FALSE]
     df.init.tours = df.init.tours[df.init.tours$era %in% filter.eras, , drop = FALSE]
     df.tours = df.tours[df.tours$era %in% filter.eras, , drop = FALSE]
   }
@@ -158,6 +156,17 @@ plotNetworkFancy = function(instance,
   )
   pl = pl + viridis::scale_colour_viridis(discrete = TRUE, end = 0.85)
   return(pl)
+}
+
+getToursFromMeta = function(meta) {
+  checkmate::assertDataFrame(meta)
+  n.eras = max(meta$era)
+  n.vehicles = unique(meta$n.vehicles)
+
+  # DM tours
+  return(list(
+    dm.tours = lapply(meta$dm.tour, stringToTours),
+    init.tours = lapply(meta$init.tour, stringToTours)))
 }
 
 
