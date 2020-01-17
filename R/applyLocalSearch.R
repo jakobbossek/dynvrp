@@ -25,7 +25,8 @@ applyLocalSearch = function(ind, instance, more.args, ...) {
     ls.res = findHamiltonianPath(
       instance,
       active.nodes = sort(active.nodes) + 2L,
-      start.id = start.id, dest.id = 2L)
+      start.id = start.id, dest.id = 2L,
+      more.args)
 
     # nodes 1 and 2 are depots above. Hence, we need to recode to 1-based representation.
     ind$t[idx.tour] = ls.res - 2L

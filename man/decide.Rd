@@ -11,7 +11,7 @@ decideRandom(fitness, ...)
 
 decideInteractive(fitness, ...)
 
-decideRank(obj, q = 0.5, ...)
+decideRank(fitness, obj = 1, q = 0.5, ...)
 }
 \arguments{
 \item{fitness}{[\code{matrix}]\cr

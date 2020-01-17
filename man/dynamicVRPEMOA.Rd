@@ -5,11 +5,14 @@
 \title{Evolutionary Multi-Objective Algorithm for dynamic routing.}
 \usage{
 dynamicVRPEMOA(fitness.fun, instance, time.resolution = 100L,
-  n.vehicles = 1L, decision.fun = dynvrp::decideRandom, do.pause = FALSE,
-  p.swap = 1, init.keep = TRUE, local.search.method = NULL,
-  local.search.gens = 100L, init.distribution = "binomial",
+  n.timeslots = NULL, n.vehicles = 1L,
+  decision.fun = dynvrp::decideRandom, decision.params = list(),
+  do.pause = FALSE, p.swap = 1, init.keep = TRUE,
+  local.search.method = NULL, local.search.gens = 100L,
+  init.distribution = "uniform",
   stop.conds = list(ecr::stopOnIters(100L)), mu = 50L,
-  local.search.args = list(), lambda = mu, ...)
+  local.search.args = list(on.ls.failure), lambda = mu, seed = NULL,
+  aposteriori = FALSE, ...)
 }
 \arguments{
 \item{fitness.fun}{[\code{function(ind, instance, ...)}]\cr
@@ -32,7 +35,13 @@ Default is 1.}
 Function used to make decision after each time slot.
 May be used for interactive decision or decision maker simulation (e.g.,
 always decide for lexicographic optimum regarding one of the objective functions).
-Default is \code{decideRandom}, i.e., random choice of solution.}
+Default is \code{decideRandom}, i.e., random choice of solution.
+If a vector of functions is passed the i-th function is used to make a choice
+in the i-th era.}
+
+\item{decision.params}{[\code{list | NULL}]\cr
+List of named lists of parameter choices for \code{decision.fun}.
+The i-the list is passed down to the i-th decision.fun in the i-th era.}
 
 \item{do.pause}{[\code{logical(1)}]\cr
 Pause execution after each time slot?
@@ -76,6 +85,14 @@ Defaults to empty list.}
 \item{lambda}{[\code{integer(1)}]\cr
 Number of offspring.
 Default is \code{mu}.}
+
+\item{seed}{[\code{integer} | \code{NULL}]\cr
+Optional seed for run.
+Set outside the algorithm by default.}
+
+\item{aposteriori}{[\code{logical(1)}]\cr
+Treat the problem from an a posteriori perspective, i.e., perform just a single run of the EMOA,
+but give him oracle knowledge on the request times of dynamic requests.}
 
 \item{...}{[any]\cr
 Not used at the moment.}

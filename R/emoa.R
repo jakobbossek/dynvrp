@@ -118,7 +118,7 @@ dynamicVRPEMOA = function(fitness.fun,
   init.distribution = "uniform",
   stop.conds = list(ecr::stopOnIters(100L)),
   mu = 50L,
-  local.search.args = list(),
+  local.search.args = list(on.ls.failure),
   lambda = mu,
   seed = NULL,
   aposteriori = FALSE,
@@ -236,6 +236,7 @@ dynamicVRPEMOA = function(fitness.fun,
         break
       }
     } # END OF EMOA LOOP
+    cat(".\n")
 
     # final LS polishing
     if (!is.null(local.search.method)) {

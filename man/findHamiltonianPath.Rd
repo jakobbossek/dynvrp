@@ -6,7 +6,8 @@
 \usage{
 findHamiltonianPath(instance,
   active.nodes = seq_len(salesperson::getNumberOfNodes(instance) + 2L),
-  start.id = 1L, dest.id = 2L)
+  start.id = 1L, dest.id = 2L, more.args = list(on.ls.failure =
+  "stop"))
 }
 \arguments{
 \item{instance}{[Network]\cr

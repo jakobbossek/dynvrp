@@ -5,7 +5,8 @@
 \title{Individual initializer.}
 \usage{
 initIndividual(instance, current.time = 0, init.tours = integer(),
-  n.vehicles = 1L, template.ind = NULL, init.distribution = "binomial")
+  n.vehicles = 1L, template.ind = NULL,
+  init.distribution = "binomial")
 }
 \arguments{
 \item{instance}{[\code{Network}]\cr

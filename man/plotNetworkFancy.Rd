@@ -4,9 +4,10 @@
 \alias{plotNetworkFancy}
 \title{Visualize tours driven by vehicles by era.}
 \usage{
-plotNetworkFancy(instance, time.resolution, tours = NULL, init.tours = NULL,
-  customers.by.era = TRUE, highlight.depots = TRUE,
-  desaturate.nonvisited = FALSE)
+plotNetworkFancy(instance, time.resolution, tours = NULL,
+  init.tours = NULL, customers.by.era = TRUE,
+  highlight.depots = TRUE, desaturate.nonvisited = FALSE,
+  filter.eras = NULL, facet.type = "grid", facet.args = list())
 }
 \arguments{
 \item{instance}{[\code{Network}]\cr

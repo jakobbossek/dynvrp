@@ -124,6 +124,7 @@ initIndividual = function(instance, current.time = 0, init.tours = integer(), n.
 
   ind$n.dynamic.active = sum(ind$b[idx.dynamic.available])
   ind$n.dynamic.inactive = ind$n.dynamic.available - ind$n.dynamic.active
+  ind$n.not.visited = n - sum(ind$it)
 
   #DEBUG
   stopifnot(sum(ind$b) <= n.mandatory + n.dynamic.available)

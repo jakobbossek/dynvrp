@@ -19,7 +19,8 @@ findHamiltonianPath = function(
   instance,
   active.nodes = seq_len(salesperson::getNumberOfNodes(instance) + 2L),
   start.id = 1L,
-  dest.id = 2L) {
+  dest.id = 2L,
+  more.args = list(on.ls.failure = "stop")) {
 
   # nothing to do: start->node->end is the only option
   if (length(active.nodes) <= 3L) {
@@ -74,7 +75,7 @@ findHamiltonianPath = function(
   instance2 = salesperson::makeNetwork(coordinates = dummy.coords, distance.matrix = dmat2, name = "dummy")
 
   # actually run solver
-  max.tries = 5L
+  max.tries = 2L
   n.tries = 1L
   res = NULL
   repeat {
@@ -88,7 +89,18 @@ findHamiltonianPath = function(
       break
     }
     if (n.tries >= max.tries) {
-      BBmisc::stopf("[dynamicVRPEMOA] Local search failed %i times.", n.tries)
+      if (more.args$on.ls.failure == "stop") {
+        BBmisc::stopf("[dynamicVRPEMOA] Local search failed %i times.", n.tries)
+      } else if (more.args$on.ls.failure == "warn") {
+        BBmisc::warningf("[dynamicVRPEMOA] Local search failed %i times. Returning original permutation.", n.tries)
+        return(active.nodes)
+      }
+
+      # print(instance2)
+      # AN <<- active.nodes
+      # AN2 <<- active.nodes2
+      # I2 <<- instance2
+      # print(res)
     }
     n.tries = n.tries + 1L
   }
@@ -108,8 +120,8 @@ findHamiltonianPath = function(
   # here simply be taking the shorter tour (reversed vs original).
   # (See paper about R package TSP by Hahsler and Hornik)
   cut.tour = TSP::cut_tour(atsp.tour, sd.id)
-  print(sort(as.integer(cut.tour)))
-  print(dim(dist.mat))
+  # print(sort(as.integer(cut.tour)))
+  # print(dim(dist.mat))
   h.path1 = c(2L, cut.tour + 2L, 1L)
   h.path2 = c(1L, cut.tour + 2L, 2L)
 
@@ -122,7 +134,7 @@ findHamiltonianPath = function(
   # print(h.path1.length)
   # print(h.path2.length)
 
-  instance3 = salesperson::makeNetwork(coordinates = coords, name = "dummy2")
+  #instance3 = salesperson::makeNetwork(coordinates = coords, name = "dummy2")
 
   # an = if (h.path1.length < h.path2.length) {
   #   active.nodes[rev(cut.tour)]
